@@ -1,4 +1,4 @@
-# ABAP UI Toolbox
+# abap-utils
 
 Utilities for ABAP Development
 
