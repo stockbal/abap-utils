@@ -92,7 +92,7 @@ ENDCLASS.
 
 
 
-CLASS ZCL_DUTILS_CI_RESULT_VIEW IMPLEMENTATION.
+CLASS zcl_dutils_ci_result_view IMPLEMENTATION.
 
 
   METHOD constructor.
@@ -132,7 +132,6 @@ CLASS ZCL_DUTILS_CI_RESULT_VIEW IMPLEMENTATION.
           col-r_column->set_short_text( space ).
           col-r_column->set_medium_text( space ).
           col-r_column->set_long_text( 'Sub Object' ).
-
 
         WHEN c_fields-text.
           CAST cl_salv_column_table( col-r_column )->set_cell_type( if_salv_c_cell_type=>hotspot ).
@@ -323,7 +322,13 @@ CLASS ZCL_DUTILS_CI_RESULT_VIEW IMPLEMENTATION.
 
 
   METHOD refresh_results.
-    ci_run->run( ).
+    TRY.
+        ci_run->run( ).
+      CATCH zcx_dutils_exception INTO DATA(error).
+        MESSAGE error->get_text( ) TYPE 'I' DISPLAY LIKE 'E'.
+        RETURN.
+    ENDTRY.
+
     process_results( ).
 
     ci_result_alv->refresh( s_stable = VALUE #( col = abap_true row = abap_true ) ).

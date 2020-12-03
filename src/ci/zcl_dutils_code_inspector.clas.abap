@@ -9,9 +9,9 @@ CLASS zcl_dutils_code_inspector DEFINITION
     CLASS-METHODS create_run
       IMPORTING
         variant_name         TYPE sci_chkv
-        object_set           TYPE zif_dutils_ci_run=>ty_ci_object_set OPTIONAL
+        object_set           TYPE zif_dutils_ci_run=>ty_ci_object_set
         resolve_sub_packages TYPE abap_bool
-        object_assignemnt    TYPE zif_dutils_ci_run=>ty_ci_object_assignment OPTIONAL
+        object_assignemnt    TYPE zif_dutils_ci_run=>ty_ci_object_assignment
       RETURNING
         VALUE(result)        TYPE REF TO zif_dutils_ci_run
       RAISING
