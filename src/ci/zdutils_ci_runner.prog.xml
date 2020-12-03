@@ -1768,6 +1768,12 @@
     </item>
     <item>
      <ID>S</ID>
+     <KEY>S_APPCO</KEY>
+     <ENTRY>Component ID</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>S</ID>
      <KEY>S_CLAS</KEY>
      <ENTRY>Class/Interface</ENTRY>
      <LENGTH>23</LENGTH>
@@ -1786,9 +1792,21 @@
     </item>
     <item>
      <ID>S</ID>
+     <KEY>S_DELLAY</KEY>
+     <ENTRY>Transport Layer</ENTRY>
+     <LENGTH>23</LENGTH>
+    </item>
+    <item>
+     <ID>S</ID>
      <KEY>S_FUGR</KEY>
      <ENTRY>Function group</ENTRY>
      <LENGTH>22</LENGTH>
+    </item>
+    <item>
+     <ID>S</ID>
+     <KEY>S_PACK</KEY>
+     <ENTRY>Package</ENTRY>
+     <LENGTH>15</LENGTH>
     </item>
     <item>
      <ID>S</ID>
@@ -1798,38 +1816,20 @@
     </item>
     <item>
      <ID>S</ID>
-     <KEY>S_TA_A</KEY>
-     <ENTRY>Component ID</ENTRY>
-     <LENGTH>20</LENGTH>
-    </item>
-    <item>
-     <ID>S</ID>
-     <KEY>S_TA_C</KEY>
-     <ENTRY>Software Component</ENTRY>
-     <LENGTH>26</LENGTH>
-    </item>
-    <item>
-     <ID>S</ID>
-     <KEY>S_TA_P</KEY>
-     <ENTRY>Package</ENTRY>
-     <LENGTH>15</LENGTH>
-    </item>
-    <item>
-     <ID>S</ID>
-     <KEY>S_TA_R</KEY>
+     <KEY>S_RESPON</KEY>
      <ENTRY>Person Responsible</ENTRY>
      <LENGTH>26</LENGTH>
     </item>
     <item>
      <ID>S</ID>
-     <KEY>S_TA_S</KEY>
-     <ENTRY>Original System</ENTRY>
-     <LENGTH>23</LENGTH>
+     <KEY>S_SOCOMP</KEY>
+     <ENTRY>Software Component</ENTRY>
+     <LENGTH>26</LENGTH>
     </item>
     <item>
      <ID>S</ID>
-     <KEY>S_TA_T</KEY>
-     <ENTRY>Transport Layer</ENTRY>
+     <KEY>S_SRCSYS</KEY>
+     <ENTRY>Original System</ENTRY>
      <LENGTH>23</LENGTH>
     </item>
     <item>
