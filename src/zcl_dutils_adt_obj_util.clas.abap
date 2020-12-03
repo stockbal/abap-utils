@@ -103,7 +103,7 @@ CLASS zcl_dutils_adt_obj_util DEFINITION
         adt_obj_info TYPE ty_adt_obj_ref_info.
     CLASS-METHODS adjust_object_reference
       CHANGING
-        adt_obj_info TYPE zcl_abaptags_adt_util=>ty_adt_obj_ref_info.
+        adt_obj_info TYPE ty_adt_obj_ref_info.
 ENDCLASS.
 
 
