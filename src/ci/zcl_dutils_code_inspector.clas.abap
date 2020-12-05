@@ -53,7 +53,9 @@ CLASS zcl_dutils_code_inspector IMPLEMENTATION.
         OTHERS                   = 3 ).
 
     IF sy-subrc <> 0.
-      zcx_dutils_exception=>raise( |No valid check variant { check_variant_name  }| ).
+      RAISE EXCEPTION TYPE zcx_dutils_exception
+        EXPORTING
+          text = |No valid check variant { check_variant_name  }|.
     ENDIF.
 
   ENDMETHOD.

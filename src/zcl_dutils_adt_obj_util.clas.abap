@@ -151,11 +151,15 @@ CLASS zcl_dutils_adt_obj_util IMPLEMENTATION.
                                            EXCEPTIONS OTHERS   = 1 ).
 
         IF sy-subrc <> 0.
-          zcx_dutils_exception=>raise( 'ADT Jump Error' ).
+          RAISE EXCEPTION TYPE zcx_dutils_exception
+            EXPORTING
+              text =  'ADT Jump Error' .
         ENDIF.
 
       CATCH cx_root.
-        zcx_dutils_exception=>raise( 'ADT Jump Error' ).
+        RAISE EXCEPTION TYPE zcx_dutils_exception
+          EXPORTING
+            text =  'ADT Jump Error' .
     ENDTRY.
 
   ENDMETHOD.
@@ -174,7 +178,9 @@ CLASS zcl_dutils_adt_obj_util IMPLEMENTATION.
       EXCEPTIONS
         OTHERS      = 1 ).
     IF sy-subrc <> 0.
-      zcx_dutils_exception=>raise( |Object with name { tr_obj_name } and type { object_type } does not exist| ).
+      RAISE EXCEPTION TYPE zcx_dutils_exception
+        EXPORTING
+          text =  |Object with name { tr_obj_name } and type { object_type } does not exist| .
     ENDIF.
 
     DATA(adt_tools_f) = cl_adt_tools_core_factory=>get_instance( ).
@@ -190,7 +196,9 @@ CLASS zcl_dutils_adt_obj_util IMPLEMENTATION.
         OTHERS            = 3 ).
 
     IF sy-subrc <> 0.
-      zcx_dutils_exception=>raise( c_error_messages-wb_request_not_created ).
+      RAISE EXCEPTION TYPE zcx_dutils_exception
+        EXPORTING
+          text =  c_error_messages-wb_request_not_created .
     ENDIF.
 
     DATA(vit_adt_mapper) = adt_tools_f->get_uri_mapper_vit( ).
@@ -208,11 +216,6 @@ CLASS zcl_dutils_adt_obj_util IMPLEMENTATION.
           wb_request      = wb_request
           mapping_options = mapping_options
       ).
-**      eo_adt_objectref = eo_adt_uri_mapper->map_wb_object_to_objref(
-**          wb_object       = lo_wb_object
-**          mapping_options = lo_mapping_options
-**      ).
-
       IF program IS SUPPLIED.
         adt_uri_mapper->map_objref_to_include(
           EXPORTING

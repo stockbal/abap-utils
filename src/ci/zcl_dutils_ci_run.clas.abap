@@ -81,9 +81,9 @@ CLASS zcl_dutils_ci_run IMPLEMENTATION.
     " Because we want to persist them so we can run it in parallel.
     " Both are deleted afterwards.
     inspection_name = |{ sy-uname }_{ sy-datum }_{ sy-uzeit }|.
-    run_mode = cond #(
-        when sy-batch = abap_true then zif_dutils_ci_run~c_run_mode-run_in_batch
-        else                           zif_dutils_ci_run~c_run_mode-run_loc_parallel ).
+    run_mode = COND #(
+        WHEN sy-batch = abap_true THEN zif_dutils_ci_run~c_run_mode-run_in_batch
+        ELSE                           zif_dutils_ci_run~c_run_mode-run_loc_parallel ).
   ENDMETHOD.
 
 
@@ -142,7 +142,9 @@ CLASS zcl_dutils_ci_run IMPLEMENTATION.
           OTHERS              = 5 ).
 
       IF sy-subrc <> 0.
-        zcx_dutils_exception=>raise( |Couldn't delete inspection. Subrc = { sy-subrc }| ).
+        RAISE EXCEPTION TYPE zcx_dutils_exception
+          EXPORTING
+            text = |Couldn't delete inspection. Subrc = { sy-subrc }|.
       ENDIF.
 
     ENDIF.
@@ -158,7 +160,9 @@ CLASS zcl_dutils_ci_run IMPLEMENTATION.
           OTHERS           = 6 ).
 
       IF sy-subrc <> 0.
-        zcx_dutils_exception=>raise( |Couldn't delete objectset. Subrc = { sy-subrc }| ).
+        RAISE EXCEPTION TYPE zcx_dutils_exception
+          EXPORTING
+            text = |Couldn't delete objectset. Subrc = { sy-subrc }|.
       ENDIF.
     ENDIF.
 
@@ -168,7 +172,9 @@ CLASS zcl_dutils_ci_run IMPLEMENTATION.
   METHOD create_variant.
 
     IF variant_name IS INITIAL.
-      zcx_dutils_exception=>raise( |No check variant supplied.| ).
+      RAISE EXCEPTION TYPE zcx_dutils_exception
+        EXPORTING
+          text = |No check variant supplied.|.
     ENDIF.
 
     cl_ci_checkvariant=>get_ref(
@@ -184,9 +190,13 @@ CLASS zcl_dutils_ci_run IMPLEMENTATION.
 
     CASE sy-subrc.
       WHEN 1.
-        zcx_dutils_exception=>raise( |Check variant { variant_name } doesn't exist| ).
+        RAISE EXCEPTION TYPE zcx_dutils_exception
+          EXPORTING
+            text = |Check variant { variant_name } doesn't exist|.
       WHEN 2.
-        zcx_dutils_exception=>raise( |Parameter missing for check variant { variant_name }| ).
+        RAISE EXCEPTION TYPE zcx_dutils_exception
+          EXPORTING
+            text = |Parameter missing for check variant { variant_name }|.
     ENDCASE.
 
   ENDMETHOD.
@@ -228,7 +238,9 @@ CLASS zcl_dutils_ci_run IMPLEMENTATION.
         OTHERS           = 4 ).
 
     IF sy-subrc <> 0.
-      zcx_dutils_exception=>raise( |Failed to create inspection. Subrc = { sy-subrc }| ).
+      RAISE EXCEPTION TYPE zcx_dutils_exception
+        EXPORTING
+          text = |Failed to create inspection. Subrc = { sy-subrc }|.
     ENDIF.
 
     inspection->set(
@@ -243,7 +255,9 @@ CLASS zcl_dutils_ci_run IMPLEMENTATION.
         OTHERS              = 4 ).
 
     IF sy-subrc <> 0.
-      zcx_dutils_exception=>raise( |Failed to save inspection. Subrc = { sy-subrc }| ).
+      RAISE EXCEPTION TYPE zcx_dutils_exception
+        EXPORTING
+          text = |Failed to save inspection. Subrc = { sy-subrc }|.
     ENDIF.
 
   ENDMETHOD.
@@ -304,7 +318,9 @@ CLASS zcl_dutils_ci_run IMPLEMENTATION.
             OTHERS              = 5
         ).
         IF sy-subrc <> 0.
-          zcx_dutils_exception=>raise( |Object Set Creation failed. Subrc = { sy-subrc }| ).
+          RAISE EXCEPTION TYPE zcx_dutils_exception
+            EXPORTING
+              text = |Object Set Creation failed. Subrc = { sy-subrc }|.
         ENDIF.
       ENDIF.
     ELSEIF object_set_ranges IS NOT INITIAL.
@@ -343,14 +359,18 @@ CLASS zcl_dutils_ci_run IMPLEMENTATION.
           OTHERS                = 5
       ).
       IF sy-subrc <> 0.
-        zcx_dutils_exception=>raise( |Object Set Creation failed. Subrc = { sy-subrc }| ).
+        RAISE EXCEPTION TYPE zcx_dutils_exception
+          EXPORTING
+            text = |Object Set Creation failed. Subrc = { sy-subrc }|.
       ENDIF.
 
     ENDIF.
 
     " if no objects have been determined no inspection is possible
     IF lines( object_set->iobjlst-objects ) = 0.
-      zcx_dutils_exception=>raise( |No Objects for checking have been determined.| ).
+      RAISE EXCEPTION TYPE zcx_dutils_exception
+        EXPORTING
+          text = |No Objects for checking have been determined.|.
     ENDIF.
   ENDMETHOD.
 
@@ -365,7 +385,9 @@ CLASS zcl_dutils_ci_run IMPLEMENTATION.
         OTHERS                = 2 ).
 
     IF sy-subrc <> 0.
-      zcx_dutils_exception=>raise( |Code inspector run failed. Subrc = { sy-subrc }| ).
+      RAISE EXCEPTION TYPE zcx_dutils_exception
+        EXPORTING
+          text = |Code inspector run failed. Subrc = { sy-subrc }|.
     ENDIF.
 
     inspection->plain_list( IMPORTING p_list = plain_results ).
