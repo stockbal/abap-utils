@@ -1,37 +1,36 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<abapGit version="v1.0.0" serializer="LCL_OBJECT_CLAS" serializer_version="v1.0.0">
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_INTF" serializer_version="v1.0.0">
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
-   <VSEOCLASS>
-    <CLSNAME>ZCL_DUTILS_PACKAGE_UTIL</CLSNAME>
+   <VSEOINTERF>
+    <CLSNAME>ZIF_DUTILS_PACKAGE_ACCESS</CLSNAME>
     <LANGU>E</LANGU>
     <DESCRIPT>Package Utility</DESCRIPT>
+    <EXPOSURE>2</EXPOSURE>
     <STATE>1</STATE>
-    <CLSCCINCL>X</CLSCCINCL>
-    <FIXPT>X</FIXPT>
     <UNICODE>X</UNICODE>
-   </VSEOCLASS>
+   </VSEOINTERF>
    <DESCRIPTIONS>
     <SEOCOMPOTX>
-     <CLSNAME>ZCL_DUTILS_PACKAGE_UTIL</CLSNAME>
+     <CLSNAME>ZIF_DUTILS_PACKAGE_ACCESS</CLSNAME>
      <CMPNAME>GET_SUBPACKAGES</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>Retrieves sub packages for top package</DESCRIPT>
     </SEOCOMPOTX>
     <SEOCOMPOTX>
-     <CLSNAME>ZCL_DUTILS_PACKAGE_UTIL</CLSNAME>
+     <CLSNAME>ZIF_DUTILS_PACKAGE_ACCESS</CLSNAME>
      <CMPNAME>GET_SUBPACKAGES_BY_RANGE</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>Retrieves sub packages by range</DESCRIPT>
     </SEOCOMPOTX>
     <SEOCOMPOTX>
-     <CLSNAME>ZCL_DUTILS_PACKAGE_UTIL</CLSNAME>
+     <CLSNAME>ZIF_DUTILS_PACKAGE_ACCESS</CLSNAME>
      <CMPNAME>GET_SUBPACKAGES_BY_TAB</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>Retrieves sub packages by tab</DESCRIPT>
     </SEOCOMPOTX>
     <SEOCOMPOTX>
-     <CLSNAME>ZCL_DUTILS_PACKAGE_UTIL</CLSNAME>
+     <CLSNAME>ZIF_DUTILS_PACKAGE_ACCESS</CLSNAME>
      <CMPNAME>RESOLVE_PACKAGES</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>Resolves full package names from Range Table</DESCRIPT>

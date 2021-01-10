@@ -5,12 +5,12 @@ CLASS zcl_dutils_ci_result_view DEFINITION
   CREATE PUBLIC .
 
   PUBLIC SECTION.
-    "! <p class="shorttext synchronized" lang="en">CONSTRUCTOR</p>
+    INTERFACES zif_dutils_ci_result_view.
+
     METHODS constructor
       IMPORTING
         ci_run          TYPE REF TO zif_dutils_ci_run
         enable_adt_jump TYPE abap_bool.
-    METHODS show.
   PROTECTED SECTION.
   PRIVATE SECTION.
     CONSTANTS:
@@ -20,9 +20,7 @@ CLASS zcl_dutils_ci_result_view DEFINITION
         only_errors   TYPE ui_func VALUE 'ERRORS',
         only_warnings TYPE ui_func VALUE 'WARNINGS',
         only_infos    TYPE ui_func VALUE 'INFOS',
-      END OF c_functions.
-
-    CONSTANTS:
+      END OF c_functions,
       BEGIN OF c_fields,
         kind            TYPE salv_de_column VALUE 'KIND',
         kind_icon       TYPE salv_de_column VALUE 'KIND_ICON',
@@ -52,63 +50,71 @@ CLASS zcl_dutils_ci_result_view DEFINITION
         description     TYPE scir_alvlist-description,
       END OF ty_ci_result.
 
-    DATA ci_result_alv TYPE REF TO cl_salv_table.
-    DATA plain_results TYPE STANDARD TABLE OF ty_ci_result WITH EMPTY KEY.
-    DATA ci_run TYPE REF TO zif_dutils_ci_run.
-    DATA enable_adt_jump TYPE abap_bool.
+    DATA:
+      ci_result_alv   TYPE REF TO cl_salv_table,
+      plain_results   TYPE STANDARD TABLE OF ty_ci_result WITH EMPTY KEY,
+      ci_run          TYPE REF TO zif_dutils_ci_run,
+      enable_adt_jump TYPE abap_bool.
 
-    METHODS create_alv
-      RAISING
-        cx_salv_msg
-        cx_salv_existing
-        cx_salv_wrong_call.
-
-    METHODS filter_by_kind
-      IMPORTING
-        kind TYPE sci_errty OPTIONAL.
-    METHODS refresh_results.
-    METHODS process_results.
-    METHODS process_result
-      CHANGING
-        result TYPE ty_ci_result.
-    METHODS navigate_to_result
-      IMPORTING
-        row TYPE i.
-    METHODS on_user_command
-        FOR EVENT added_function OF cl_salv_events
-      IMPORTING
-        e_salv_function.
-    METHODS on_link_click
-        FOR EVENT link_click OF cl_salv_events_table
-      IMPORTING
-        column
-        row.
-    METHODS on_double_click
-        FOR EVENT double_click OF cl_salv_events_table
-      IMPORTING
-        column
-        row.
+    METHODS:
+      create_alv
+        RAISING
+          cx_salv_msg
+          cx_salv_existing
+          cx_salv_wrong_call,
+      filter_by_kind
+        IMPORTING
+          kind TYPE sci_errty OPTIONAL,
+      refresh_results,
+      process_results,
+      process_result
+        CHANGING
+          result TYPE ty_ci_result,
+      navigate_to_result
+        IMPORTING
+          row TYPE i,
+      set_list_header,
+      on_user_command
+          FOR EVENT added_function OF cl_salv_events
+        IMPORTING
+          e_salv_function,
+      on_link_click
+          FOR EVENT link_click OF cl_salv_events_table
+        IMPORTING
+          column
+          row,
+      on_double_click
+          FOR EVENT double_click OF cl_salv_events_table
+        IMPORTING
+          column
+          row.
 ENDCLASS.
 
 
 
 CLASS zcl_dutils_ci_result_view IMPLEMENTATION.
 
-
   METHOD constructor.
     me->ci_run = ci_run.
     me->enable_adt_jump = enable_adt_jump.
+  ENDMETHOD.
+
+  METHOD zif_dutils_ci_result_view~show.
     process_results( ).
+    TRY.
+        create_alv( ).
+      CATCH cx_salv_msg cx_salv_existing cx_salv_wrong_call.
+    ENDTRY.
   ENDMETHOD.
 
 
   METHOD create_alv.
     cl_salv_table=>factory(
-      IMPORTING r_salv_table = ci_result_alv
-      CHANGING  t_table      = plain_results
+      IMPORTING r_salv_table = me->ci_result_alv
+      CHANGING  t_table      = me->plain_results
     ).
 
-    DATA(cols) = ci_result_alv->get_columns( ).
+    DATA(cols) = me->ci_result_alv->get_columns( ).
 
     cols->set_optimize( ).
 
@@ -140,32 +146,31 @@ CLASS zcl_dutils_ci_result_view IMPLEMENTATION.
 
     ENDLOOP.
 
-    DATA(disp_settings) = ci_result_alv->get_display_settings( ).
-    disp_settings->set_list_header( 'Code Inspector - Results' ).
+    set_list_header( ).
 
-    DATA(functions) = ci_result_alv->get_functions( ).
-    ci_result_alv->set_screen_status(
+    DATA(functions) = me->ci_result_alv->get_functions( ).
+    me->ci_result_alv->set_screen_status(
         report        = 'ZDUTILS_CI_RUNNER'
         pfstatus      = 'CI_RESULTS'
         set_functions = cl_salv_table=>c_functions_all
     ).
 
-    DATA(events) = ci_result_alv->get_event( ).
+    DATA(events) = me->ci_result_alv->get_event( ).
     SET HANDLER:
       on_user_command FOR events,
       on_link_click FOR events,
       on_double_click FOR events.
 
-    ci_result_alv->display( ).
+    me->ci_result_alv->display( ).
   ENDMETHOD.
 
 
   METHOD filter_by_kind.
     DATA: kind_filter TYPE REF TO cl_salv_filter.
 
-    CHECK ci_result_alv IS BOUND.
+    CHECK me->ci_result_alv IS BOUND.
 
-    DATA(filters) = ci_result_alv->get_filters( ).
+    DATA(filters) = me->ci_result_alv->get_filters( ).
 
     IF kind IS INITIAL.
       filters->remove_filter( c_fields-kind ).
@@ -189,25 +194,27 @@ CLASS zcl_dutils_ci_result_view IMPLEMENTATION.
       ENDTRY.
     ENDIF.
 
-    ci_result_alv->refresh( s_stable     = VALUE #( row = abap_true col = abap_true )
-                            refresh_mode = if_salv_c_refresh=>full ).
+    me->ci_result_alv->refresh(
+      s_stable     = VALUE #( row = abap_true col = abap_true )
+      refresh_mode = if_salv_c_refresh=>full ).
 
   ENDMETHOD.
 
 
   METHOD navigate_to_result.
 
-    ASSIGN plain_results[ row ] TO FIELD-SYMBOL(<result>).
+    ASSIGN me->plain_results[ row ] TO FIELD-SYMBOL(<result>).
     CHECK sy-subrc = 0.
 
     TRY.
-        IF enable_adt_jump = abap_true.
+        IF me->enable_adt_jump = abap_true.
 
-          zcl_dutils_adt_obj_util=>jump_adt( object_name     = <result>-objname
-                                             object_type     = <result>-objtype
-                                             sub_object_name = <result>-sobjname
-                                             sub_object_type = <result>-sobjtype
-                                             line_number     = CONV #( <result>-line ) ).
+          zcl_dutils_adt_obj_util=>jump_adt(
+            object_name     = <result>-objname
+            object_type     = <result>-objtype
+            sub_object_name = <result>-sobjname
+            sub_object_type = <result>-sobjtype
+            line_number     = CONV #( <result>-line ) ).
           RETURN.
 
         ENDIF.
@@ -312,9 +319,9 @@ CLASS zcl_dutils_ci_result_view IMPLEMENTATION.
 
 
   METHOD process_results.
-    plain_results = CORRESPONDING #( ci_run->get_results( ) ).
+    me->plain_results = CORRESPONDING #( me->ci_run->get_results( ) ).
 
-    LOOP AT plain_results ASSIGNING FIELD-SYMBOL(<result>).
+    LOOP AT me->plain_results ASSIGNING FIELD-SYMBOL(<result>).
       process_result( CHANGING result = <result> ).
     ENDLOOP.
 
@@ -323,22 +330,23 @@ CLASS zcl_dutils_ci_result_view IMPLEMENTATION.
 
   METHOD refresh_results.
     TRY.
-        ci_run->run( ).
+        me->ci_run->run( ).
       CATCH zcx_dutils_exception INTO DATA(error).
         MESSAGE error->get_text( ) TYPE 'I' DISPLAY LIKE 'E'.
         RETURN.
     ENDTRY.
 
     process_results( ).
-
-    ci_result_alv->refresh( s_stable = VALUE #( col = abap_true row = abap_true ) ).
+    set_list_header( ).
+    me->ci_result_alv->refresh( s_stable = VALUE #( col = abap_true row = abap_true ) ).
   ENDMETHOD.
 
 
-  METHOD show.
-    TRY.
-        create_alv( ).
-      CATCH cx_salv_msg cx_salv_existing cx_salv_wrong_call.
-    ENDTRY.
+  METHOD set_list_header.
+    CHECK me->ci_result_alv IS BOUND.
+
+    DATA(disp_settings) = me->ci_result_alv->get_display_settings( ).
+    disp_settings->set_list_header( |Code Inspector - Results (Duration: { me->ci_run->get_duration( ) }s)| ).
   ENDMETHOD.
+
 ENDCLASS.

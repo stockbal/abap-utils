@@ -55,4 +55,9 @@ INTERFACE zif_dutils_ci_run
     RETURNING
       VALUE(result) TYPE abap_bool.
 
+  "! <p class="shorttext synchronized" lang="en">Returns duration of inspection run</p>
+  METHODS get_duration
+    RETURNING
+      VALUE(result) TYPE i.
+
 ENDINTERFACE.

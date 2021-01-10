@@ -19,6 +19,12 @@
     </SEOCOMPOTX>
     <SEOCOMPOTX>
      <CLSNAME>ZIF_DUTILS_CI_RUN</CLSNAME>
+     <CMPNAME>GET_DURATION</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Returns duration of inspection run</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZIF_DUTILS_CI_RUN</CLSNAME>
      <CMPNAME>GET_RESULTS</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>Performs Re-Run of current Inspection</DESCRIPT>

@@ -47,13 +47,17 @@ SELECTION-SCREEN END OF BLOCK additional.
 
 
 START-OF-SELECTION.
+  IF sy-batch = abap_true.
+    MESSAGE |Batch Processing is not possible!| TYPE 'I' DISPLAY LIKE 'E'.
+    RETURN.
+  ENDIF.
+
   TRY.
       zcl_dutils_code_inspector=>validate_check_variant( p_civar ).
-
       DATA(ci_run) = zcl_dutils_code_inspector=>create_run(
         variant_name          = p_civar
         resolve_sub_packages  = p_subp
-        object_assignemnt     = VALUE #(
+        object_assignment     = VALUE #(
            package_range         = s_pack[]
            appl_comp_range       = s_appco[]
            software_comp_range   = s_socomp[]
@@ -70,16 +74,14 @@ START-OF-SELECTION.
            type_group_range     = s_ddty[]
         )
       ).
-
       ci_run->run( ).
 
       IF ci_run->is_successful( ).
         MESSAGE |No Results collected| TYPE 'S'.
       ELSEIF sy-batch = abap_false.
-        DATA(ci_result) = NEW zcl_dutils_ci_result_view(
-          ci_run = ci_run
+        DATA(ci_result) = zcl_dutils_code_inspector=>create_run_result(
+          ci_run          = ci_run
           enable_adt_jump = p_adt ).
-
         ci_result->show( ).
       ENDIF.
     CATCH zcx_dutils_exception INTO DATA(error).

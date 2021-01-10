@@ -1,37 +1,14 @@
 "! <p class="shorttext synchronized" lang="en">Package Utility</p>
-CLASS zcl_dutils_package_util DEFINITION
+CLASS zcl_dutils_package_access DEFINITION
   PUBLIC
   FINAL
-  CREATE PRIVATE.
+  CREATE PUBLIC.
 
   PUBLIC SECTION.
-    "! <p class="shorttext synchronized" lang="en">Resolves full package names from Range Table</p>
-    CLASS-METHODS resolve_packages
-      IMPORTING
-        package_range TYPE zif_dutils_ty_global=>ty_package_name_range
-      RETURNING
-        VALUE(result) TYPE zif_dutils_ty_global=>ty_package_names.
-    "! <p class="shorttext synchronized" lang="en">Retrieves sub packages by range</p>
-    CLASS-METHODS get_subpackages_by_range
-      IMPORTING
-        package_range TYPE zif_dutils_ty_global=>ty_package_name_range
-      RETURNING
-        VALUE(result) TYPE zif_dutils_ty_global=>ty_package_names.
-    "! <p class="shorttext synchronized" lang="en">Retrieves sub packages by tab</p>
-    CLASS-METHODS get_subpackages_by_tab
-      IMPORTING
-        package_names TYPE zif_dutils_ty_global=>ty_package_names
-      RETURNING
-        VALUE(result) TYPE zif_dutils_ty_global=>ty_package_names.
-    "! <p class="shorttext synchronized" lang="en">Retrieves sub packages for top package</p>
-    CLASS-METHODS get_subpackages
-      IMPORTING
-        package_name  TYPE devclass
-      RETURNING
-        VALUE(result) TYPE zif_dutils_ty_global=>ty_package_names.
+    INTERFACES zif_dutils_package_access.
   PROTECTED SECTION.
   PRIVATE SECTION.
-    CLASS-METHODS list_sub_packages
+    METHODS list_sub_packages
       IMPORTING
         package_range TYPE zif_dutils_ty_global=>ty_package_name_range
       RETURNING
@@ -40,9 +17,9 @@ ENDCLASS.
 
 
 
-CLASS zcl_dutils_package_util IMPLEMENTATION.
+CLASS zcl_dutils_package_access IMPLEMENTATION.
 
-  METHOD resolve_packages.
+  METHOD zif_dutils_package_access~resolve_packages.
     CHECK package_range IS NOT INITIAL.
 
     SELECT devclass
@@ -51,11 +28,11 @@ CLASS zcl_dutils_package_util IMPLEMENTATION.
     INTO TABLE @result.
   ENDMETHOD.
 
-  METHOD get_subpackages_by_range.
+  METHOD zif_dutils_package_access~get_subpackages_by_range.
     result = list_sub_packages( package_range  ).
   ENDMETHOD.
 
-  METHOD get_subpackages.
+  METHOD zif_dutils_package_access~get_subpackages.
     result = list_sub_packages( VALUE #( ( sign = 'I' option = 'EQ' low = to_upper( package_name ) ) ) ).
   ENDMETHOD.
 
@@ -82,7 +59,7 @@ CLASS zcl_dutils_package_util IMPLEMENTATION.
     ENDWHILE.
   ENDMETHOD.
 
-  METHOD get_subpackages_by_tab.
+  METHOD zif_dutils_package_access~get_subpackages_by_tab.
     result = list_sub_packages(
       VALUE #(
         FOR pack IN package_names
