@@ -20,15 +20,9 @@
     </SEOCOMPOTX>
     <SEOCOMPOTX>
      <CLSNAME>ZCL_DUTILS_UTIL_FACTORY</CLSNAME>
-     <CMPNAME>GET_PACKAGE_ACCESS</CMPNAME>
+     <CMPNAME>GET_WB_OBJECT_UTIL</CMPNAME>
      <LANGU>E</LANGU>
-     <DESCRIPT>Retrieves instance for package access</DESCRIPT>
-    </SEOCOMPOTX>
-    <SEOCOMPOTX>
-     <CLSNAME>ZCL_DUTILS_UTIL_FACTORY</CLSNAME>
-     <CMPNAME>GET_TADIR_ACCESS</CMPNAME>
-     <LANGU>E</LANGU>
-     <DESCRIPT>Retrieves instance for TADIR access</DESCRIPT>
+     <DESCRIPT>Retrieves instance of WB Object Util</DESCRIPT>
     </SEOCOMPOTX>
    </DESCRIPTIONS>
   </asx:values>

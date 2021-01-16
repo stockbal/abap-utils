@@ -34,7 +34,7 @@ CLASS zcl_dutils_ci_run DEFINITION
           VALUE(result) TYPE abap_bool.
   PRIVATE SECTION.
     DATA:
-      package_access       TYPE REF TO zif_dutils_package_access,
+      package_reader       TYPE REF TO zif_dutils_ddic_package_reader,
       inspection           TYPE REF TO cl_ci_inspection,
       inspection_name      TYPE sci_objs,
       run_mode             TYPE zif_dutils_ci_run~ty_run_mode VALUE zif_dutils_ci_run~c_run_mode-run_loc_parallel,
@@ -72,7 +72,7 @@ ENDCLASS.
 CLASS zcl_dutils_ci_run IMPLEMENTATION.
 
   METHOD constructor.
-    me->package_access = zcl_dutils_util_factory=>get_package_access( ).
+    me->package_reader = zcl_dutils_ddic_reader_factory=>get_package_reader( ).
     me->object_set_ranges = object_set.
     me->object_assignments = object_assignment.
     me->variant_name = variant_name.
@@ -218,12 +218,12 @@ CLASS zcl_dutils_ci_run IMPLEMENTATION.
     IF me->object_assignments-package_range IS NOT INITIAL AND
        me->resolve_sub_packages = abap_true.
 
-      DATA(packages) = me->package_access->resolve_packages( me->object_assignments-package_range ).
-      DATA(sub_packages) = me->package_access->get_subpackages_by_tab( packages ).
+      DATA(packages) = me->package_reader->resolve_packages( me->object_assignments-package_range ).
+      DATA(sub_packages) = me->package_reader->get_subpackages_by_range( packages ).
 
       me->object_assignments-package_range = VALUE #(
-        ( LINES OF VALUE #( FOR pack IN packages ( sign = 'I' option = 'EQ' low = pack ) ) )
-        ( LINES OF VALUE #( FOR pack IN sub_packages ( sign = 'I' option = 'EQ' low = pack ) ) )
+        ( LINES OF packages )
+        ( LINES OF sub_packages )
       ).
     ENDIF.
 

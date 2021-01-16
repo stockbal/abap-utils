@@ -3,13 +3,21 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <VSEOINTERF>
-    <CLSNAME>ZIF_DUTILS_TADIR_ACCESS</CLSNAME>
+    <CLSNAME>ZIF_DUTILS_DDIC_TABLE_READER</CLSNAME>
     <LANGU>E</LANGU>
-    <DESCRIPT>Access to TADIR Table</DESCRIPT>
+    <DESCRIPT>Access to Table DD02l (SAP Tables)</DESCRIPT>
     <EXPOSURE>2</EXPOSURE>
     <STATE>1</STATE>
     <UNICODE>X</UNICODE>
    </VSEOINTERF>
+   <DESCRIPTIONS>
+    <SEOCOMPOTX>
+     <CLSNAME>ZIF_DUTILS_DDIC_TABLE_READER</CLSNAME>
+     <CMPNAME>GET_TABLE_WB_TYPE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Retrieves workbench type of given table</DESCRIPT>
+    </SEOCOMPOTX>
+   </DESCRIPTIONS>
   </asx:values>
  </asx:abap>
 </abapGit>
