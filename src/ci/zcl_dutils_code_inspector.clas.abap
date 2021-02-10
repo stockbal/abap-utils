@@ -4,28 +4,29 @@ CLASS zcl_dutils_code_inspector DEFINITION
   CREATE PRIVATE.
 
   PUBLIC SECTION.
-    "! <p class="shorttext synchronized" lang="en">Validates given check variant</p>
-    CLASS-METHODS validate_check_variant
-      IMPORTING
-        check_variant_name TYPE sci_chkv
-      RAISING
-        zcx_dutils_exception .
-    "! <p class="shorttext synchronized" lang="en">Creates new CI Run</p>
-    CLASS-METHODS create_run
-      IMPORTING
-        variant_name         TYPE sci_chkv
-        object_set           TYPE zif_dutils_ci_run=>ty_ci_object_set
-        resolve_sub_packages TYPE abap_bool
-        object_assignment    TYPE zif_dutils_ci_run=>ty_ci_object_assignment
-      RETURNING
-        VALUE(result)        TYPE REF TO zif_dutils_ci_run.
-    "! <p class="shorttext synchronized" lang="en">Creates new CI Run Result View</p>
-    CLASS-METHODS create_run_result
-      IMPORTING
-        ci_run          TYPE REF TO zif_dutils_ci_run
-        enable_adt_jump TYPE abap_bool
-      RETURNING
-        VALUE(result)   TYPE REF TO zif_dutils_ci_result_view.
+    CLASS-METHODS:
+      "! <p class="shorttext synchronized" lang="en">Validates given check variant</p>
+      validate_check_variant
+        IMPORTING
+          check_variant_name TYPE sci_chkv
+        RAISING
+          zcx_dutils_exception,
+      "! <p class="shorttext synchronized" lang="en">Creates new CI Run</p>
+      create_run
+        IMPORTING
+          variant_name         TYPE sci_chkv
+          object_set           TYPE zif_dutils_ci_run=>ty_ci_object_set
+          resolve_sub_packages TYPE abap_bool
+          object_assignment    TYPE zif_dutils_ci_run=>ty_ci_object_assignment
+        RETURNING
+          VALUE(result)        TYPE REF TO zif_dutils_ci_run,
+      "! <p class="shorttext synchronized" lang="en">Creates new CI Run Result View</p>
+      create_run_result
+        IMPORTING
+          ci_run          TYPE REF TO zif_dutils_ci_run
+          enable_adt_jump TYPE abap_bool
+        RETURNING
+          VALUE(result)   TYPE REF TO zif_dutils_ci_result_view.
   PROTECTED SECTION.
   PRIVATE SECTION.
 ENDCLASS.

@@ -5,14 +5,16 @@ CLASS zcl_dutils_ddic_package_reader DEFINITION
   CREATE PUBLIC.
 
   PUBLIC SECTION.
-    INTERFACES zif_dutils_ddic_package_reader.
+    INTERFACES:
+      zif_dutils_ddic_package_reader.
   PROTECTED SECTION.
   PRIVATE SECTION.
-    METHODS list_sub_packages
-      IMPORTING
-        package_range TYPE zif_dutils_ty_global=>ty_package_name_range
-      RETURNING
-        VALUE(result) TYPE zif_dutils_ty_global=>ty_package_name_range.
+    METHODS:
+      list_sub_packages
+        IMPORTING
+          package_range TYPE zif_dutils_ty_global=>ty_package_name_range
+        RETURNING
+          VALUE(result) TYPE zif_dutils_ty_global=>ty_package_name_range.
 ENDCLASS.
 
 
@@ -52,7 +54,11 @@ CLASS zcl_dutils_ddic_package_reader IMPLEMENTATION.
       WHERE parentcl IN @package_range
     INTO TABLE @package_names.
 
-    result = package_names.
+    result = VALUE #(
+      FOR package_name IN package_names
+      ( sign   = 'I'
+        option = 'EQ'
+        low    = package_name ) ).
 
     WHILE lines( package_names ) > 0.
       SELECT devclass

@@ -5,17 +5,52 @@ CLASS zcl_dutils_wb_object_util DEFINITION
   CREATE PUBLIC .
 
   PUBLIC SECTION.
-    INTERFACES zif_dutils_wb_object_util.
+    CLASS-METHODS:
+      "! <p class="shorttext synchronized" lang="en">Resolve Include to WB object</p>
+      "! Resolves a given Include to a workbench object<br/>
+      "! Possible values are:
+      "! <ul>
+      "! <li>FUGR/I - Function Group Include</li>
+      "! <li>FUGR/FF - Function Module</li>
+      "! <li>PROG/I - Program Include
+      "! </ul>
+      resolve_include_to_wb_object
+        IMPORTING
+          include_name     TYPE progname
+        RETURNING
+          VALUE(wb_object) TYPE zif_dutils_ty_global=>ty_wb_object,
+
+      "! <p class="shorttext synchronized" lang="en">Retrieves full workbench type for given type</p>
+      get_full_wb_object_type
+        IMPORTING
+          type          TYPE seu_obj
+        RETURNING
+          VALUE(result) TYPE wbobjtype,
+
+      "! <p class="shorttext synchronized" lang="en">Determines full workbench object name</p>
+      determine_wb_obj_name
+        IMPORTING
+          name          TYPE sobj_name
+          external_type TYPE trobjtype
+        RETURNING
+          VALUE(result) TYPE zif_dutils_ty_global=>ty_wb_object_name.
   PROTECTED SECTION.
   PRIVATE SECTION.
+    CLASS-METHODS:
+      get_fugr_from_prog
+        IMPORTING
+          program       TYPE progname
+        RETURNING
+          VALUE(result) TYPE rs38l_area.
 ENDCLASS.
 
 
 
-CLASS ZCL_DUTILS_WB_OBJECT_UTIL IMPLEMENTATION.
+CLASS zcl_dutils_wb_object_util IMPLEMENTATION.
 
+  METHOD get_full_wb_object_type.
 
-  METHOD zif_dutils_wb_object_util~get_full_wb_object_type.
+    "TODO: check behavior for certain types like DOCT
     cl_wb_object_type=>create_from_exttype(
       EXPORTING  p_external_id    = type
       RECEIVING  p_wb_object_type = DATA(wb_object_type)
@@ -33,7 +68,7 @@ CLASS ZCL_DUTILS_WB_OBJECT_UTIL IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD zif_dutils_wb_object_util~resolve_include_to_wb_object.
+  METHOD resolve_include_to_wb_object.
     DATA: is_fugr_include     TYPE abap_bool,
           is_functionmodule   TYPE abap_bool,
           function_name       TYPE rs38l_fnam,
@@ -49,9 +84,9 @@ CLASS ZCL_DUTILS_WB_OBJECT_UTIL IMPLEMENTATION.
         delimiter_error             = 0.
 
     IF is_fugr_include = abap_true.
-      wb_object-type = 'FUGR'.
+      wb_object-type = zif_dutils_c_tadir_type=>function_group.
     ELSE.
-      wb_object-type = 'PROG'.
+      wb_object-type = zif_dutils_c_tadir_type=>program.
     ENDIF.
 
     IF is_functionmodule = abap_true.
@@ -74,4 +109,33 @@ CLASS ZCL_DUTILS_WB_OBJECT_UTIL IMPLEMENTATION.
       wb_object-display_name = include_name.
     ENDIF.
   ENDMETHOD.
+
+  METHOD determine_wb_obj_name.
+    CASE external_type.
+
+        " Currently only Function modules receive special handling
+      WHEN zif_dutils_c_object_type=>function_module.
+        SELECT SINGLE pname FROM tfdir WHERE funcname = @name INTO @DATA(prog_of_fugr).
+        result = VALUE #(
+          display_name = name
+          name         = get_fugr_from_prog( prog_of_fugr ) ).
+
+      WHEN OTHERS.
+        result = VALUE #(
+          display_name = name
+          name         = name ).
+
+    ENDCASE.
+  ENDMETHOD.
+
+  METHOD get_fugr_from_prog.
+    CALL FUNCTION 'FUNCTION_INCLUDE_SPLIT'
+      EXPORTING
+        program = program
+      IMPORTING
+        group   = result
+      EXCEPTIONS
+        OTHERS  = 1.
+  ENDMETHOD.
+
 ENDCLASS.

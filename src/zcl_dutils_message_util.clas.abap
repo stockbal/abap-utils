@@ -5,10 +5,11 @@ CLASS zcl_dutils_message_util DEFINITION
   CREATE PRIVATE.
 
   PUBLIC SECTION.
-    "! <p class="shorttext synchronized" lang="en">Splits text into sy-msg variables</p>
-    CLASS-METHODS split_string_to_symsg
-      IMPORTING
-        text TYPE string.
+    CLASS-METHODS:
+      "! <p class="shorttext synchronized" lang="en">Splits text into sy-msg variables</p>
+      split_string_to_symsg
+        IMPORTING
+          text TYPE string.
   PROTECTED SECTION.
   PRIVATE SECTION.
 ENDCLASS.

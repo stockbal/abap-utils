@@ -2,7 +2,8 @@
 INTERFACE zif_dutils_ci_result_view
   PUBLIC .
 
-  "! <p class="shorttext synchronized" lang="en">Shows results of CI Run</p>
-  METHODS show.
+  METHODS:
+    "! <p class="shorttext synchronized" lang="en">Shows results of CI Run</p>
+    show.
 
 ENDINTERFACE.

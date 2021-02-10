@@ -5,84 +5,86 @@ CLASS zcl_dutils_adt_obj_util DEFINITION
   CREATE PRIVATE.
 
   PUBLIC SECTION.
-    TYPES: BEGIN OF ty_adt_obj_ref_info.
-             INCLUDE TYPE sadt_object_reference.
-             TYPES: parent_type TYPE string.
-    TYPES: parent_name TYPE string.
-    TYPES: END OF ty_adt_obj_ref_info.
+    TYPES BEGIN OF ty_adt_obj_ref_info.
+    INCLUDE TYPE sadt_object_reference.
+    TYPES: parent_type TYPE string,
+           parent_name TYPE string.
+    TYPES END OF ty_adt_obj_ref_info.
 
-    "! <p class="shorttext synchronized" lang="en">Open Object with ADT Tools</p>
-    CLASS-METHODS jump_adt
-      IMPORTING
-        object_name     TYPE tadir-obj_name
-        object_type     TYPE tadir-object
-        sub_object_name TYPE tadir-obj_name OPTIONAL
-        sub_object_type TYPE tadir-object OPTIONAL
-        line_number     TYPE i OPTIONAL
-      RAISING
-        zcx_dutils_exception.
-    "! <p class="shorttext synchronized" lang="en">Retrieve adt object and names</p>
-    CLASS-METHODS get_adt_objects_and_names
-      IMPORTING
-        !object_name    TYPE tadir-obj_name
-        !object_type    TYPE tadir-object
-        retrieve_parent TYPE abap_bool OPTIONAL
-      EXPORTING
-        !adt_uri_mapper TYPE REF TO if_adt_uri_mapper
-        !adt_objectref  TYPE REF TO cl_adt_object_reference
-        !program        TYPE progname
-        !include        TYPE progname
-      RAISING
-        zcx_dutils_exception .
-    "! <p class="shorttext synchronized" lang="en">Retrieve ADT Object Reference for the given name/type</p>
-    CLASS-METHODS get_adt_obj_ref
-      IMPORTING
-        !name               TYPE seu_objkey
-        !wb_type            TYPE wbobjtype
-        retrieve_parent     TYPE abap_bool OPTIONAL
-        ignore_cache        TYPE abap_bool OPTIONAL
-      RETURNING
-        VALUE(adt_obj_info) TYPE ty_adt_obj_ref_info .
-    "! <p class="shorttext synchronized" lang="en">Retrieve ADT Object Ref for the given name/tadir type</p>
-    CLASS-METHODS get_adt_obj_ref_for_tadir_type
-      IMPORTING
-        !tadir_type         TYPE tadir-object
-        !name               TYPE sobj_name
-        retrieve_parent     TYPE abap_bool OPTIONAL
-        ignore_cache        TYPE abap_bool OPTIONAL
-      RETURNING
-        VALUE(adt_obj_info) TYPE ty_adt_obj_ref_info .
-    "! <p class="shorttext synchronized" lang="en">Maps wb object to ADT object reference</p>
-    CLASS-METHODS map_tadir_obj_to_object_ref
-      IMPORTING
-        !name               TYPE seu_objkey
-        !wb_type            TYPE wbobjtype
-        retrieve_parent     TYPE abap_bool OPTIONAL
-      RETURNING
-        VALUE(adt_obj_info) TYPE ty_adt_obj_ref_info .
-    "! <p class="shorttext synchronized" lang="en">Maps the given URI to a workbench object</p>
-    CLASS-METHODS map_uri_to_wb_object
-      IMPORTING
-        !VALUE(uri)        TYPE string
-      EXPORTING
-        VALUE(object_name) TYPE string
-        VALUE(object_type) TYPE wbobjtype
-        VALUE(tadir_type)  TYPE trobjtype
-      RAISING
-        cx_adt_uri_mapping .
+    CLASS-METHODS:
+      "! <p class="shorttext synchronized" lang="en">Open Object with ADT Tools</p>
+      jump_adt
+        IMPORTING
+          object_name     TYPE tadir-obj_name
+          object_type     TYPE tadir-object
+          sub_object_name TYPE tadir-obj_name OPTIONAL
+          sub_object_type TYPE tadir-object OPTIONAL
+          line_number     TYPE i OPTIONAL
+        RAISING
+          zcx_dutils_exception,
+      "! <p class="shorttext synchronized" lang="en">Retrieve adt object and names</p>
+      get_adt_objects_and_names
+        IMPORTING
+          !object_name    TYPE tadir-obj_name
+          !object_type    TYPE tadir-object
+          retrieve_parent TYPE abap_bool OPTIONAL
+        EXPORTING
+          !adt_uri_mapper TYPE REF TO if_adt_uri_mapper
+          !adt_objectref  TYPE REF TO cl_adt_object_reference
+          !program        TYPE progname
+          !include        TYPE progname
+        RAISING
+          zcx_dutils_exception ,
+      "! <p class="shorttext synchronized" lang="en">Retrieve ADT Object Reference for the given name/type</p>
+      get_adt_obj_ref
+        IMPORTING
+          !name               TYPE seu_objkey
+          !wb_type            TYPE wbobjtype
+          retrieve_parent     TYPE abap_bool OPTIONAL
+          ignore_cache        TYPE abap_bool OPTIONAL
+        RETURNING
+          VALUE(adt_obj_info) TYPE ty_adt_obj_ref_info ,
+      "! <p class="shorttext synchronized" lang="en">Retrieve ADT Object Ref for the given name/tadir type</p>
+      get_adt_obj_ref_for_tadir_type
+        IMPORTING
+          !tadir_type         TYPE tadir-object
+          !name               TYPE sobj_name
+          retrieve_parent     TYPE abap_bool OPTIONAL
+          ignore_cache        TYPE abap_bool OPTIONAL
+        RETURNING
+          VALUE(adt_obj_info) TYPE ty_adt_obj_ref_info ,
+      "! <p class="shorttext synchronized" lang="en">Maps wb object to ADT object reference</p>
+      map_tadir_obj_to_object_ref
+        IMPORTING
+          !name               TYPE seu_objkey
+          !wb_type            TYPE wbobjtype
+          retrieve_parent     TYPE abap_bool OPTIONAL
+        RETURNING
+          VALUE(adt_obj_info) TYPE ty_adt_obj_ref_info ,
+      "! <p class="shorttext synchronized" lang="en">Maps the given URI to a workbench object</p>
+      map_uri_to_wb_object
+        IMPORTING
+          !VALUE(uri)        TYPE string
+        EXPORTING
+          VALUE(object_name) TYPE string
+          VALUE(object_type) TYPE wbobjtype
+          VALUE(tadir_type)  TYPE trobjtype
+        RAISING
+          cx_adt_uri_mapping .
   PROTECTED SECTION.
   PRIVATE SECTION.
     CONSTANTS:
       BEGIN OF c_error_messages,
         wb_request_not_created TYPE string VALUE 'Workbench Request object could not be created' ##NO_TEXT,
-      END OF c_error_messages.
-    CONSTANTS c_segw_project_uri_pattern TYPE string VALUE '/sap/bc/adt/vit/gw/sb/project/'.
-    CONSTANTS:
+      END OF c_error_messages,
+      c_segw_project_uri_pattern TYPE string VALUE '/sap/bc/adt/vit/gw/sb/project/',
+
       BEGIN OF c_adt_types,
         function_module TYPE trobjtype VALUE 'FUNC',
         function_group  TYPE trobjtype VALUE 'FUGR',
         segw_project    TYPE trobjtype VALUE 'IWPR',
       END OF c_adt_types.
+
     TYPES:
       BEGIN OF ty_adt_object_uri_map,
         name TYPE seu_objkey,
@@ -96,14 +98,16 @@ CLASS zcl_dutils_adt_obj_util DEFINITION
         adt_object TYPE ty_adt_obj_ref_info,
       END OF ty_adt_object_info_map.
 
-    CLASS-DATA adt_obj_infos TYPE HASHED TABLE OF ty_adt_object_info_map WITH UNIQUE KEY name type.
+    CLASS-DATA:
+      adt_obj_infos TYPE HASHED TABLE OF ty_adt_object_info_map WITH UNIQUE KEY name type.
 
-    CLASS-METHODS resolve_parent_uri
-      CHANGING
-        adt_obj_info TYPE ty_adt_obj_ref_info.
-    CLASS-METHODS adjust_object_reference
-      CHANGING
-        adt_obj_info TYPE ty_adt_obj_ref_info.
+    CLASS-METHODS:
+      resolve_parent_uri
+        CHANGING
+          adt_obj_info TYPE ty_adt_obj_ref_info,
+      adjust_object_reference
+        CHANGING
+          adt_obj_info TYPE ty_adt_obj_ref_info.
 ENDCLASS.
 
 
@@ -153,13 +157,13 @@ CLASS zcl_dutils_adt_obj_util IMPLEMENTATION.
         IF sy-subrc <> 0.
           RAISE EXCEPTION TYPE zcx_dutils_exception
             EXPORTING
-              text =  'ADT Jump Error' .
+              text = 'ADT Jump Error'.
         ENDIF.
 
       CATCH cx_root.
         RAISE EXCEPTION TYPE zcx_dutils_exception
           EXPORTING
-            text =  'ADT Jump Error' .
+            text = 'ADT Jump Error'.
     ENDTRY.
 
   ENDMETHOD.
@@ -180,7 +184,7 @@ CLASS zcl_dutils_adt_obj_util IMPLEMENTATION.
     IF sy-subrc <> 0.
       RAISE EXCEPTION TYPE zcx_dutils_exception
         EXPORTING
-          text =  |Object with name { tr_obj_name } and type { object_type } does not exist| .
+          text = |Object with name { tr_obj_name } and type { object_type } does not exist|.
     ENDIF.
 
     DATA(adt_tools_f) = cl_adt_tools_core_factory=>get_instance( ).
@@ -198,7 +202,7 @@ CLASS zcl_dutils_adt_obj_util IMPLEMENTATION.
     IF sy-subrc <> 0.
       RAISE EXCEPTION TYPE zcx_dutils_exception
         EXPORTING
-          text =  c_error_messages-wb_request_not_created .
+          text = c_error_messages-wb_request_not_created.
     ENDIF.
 
     DATA(vit_adt_mapper) = adt_tools_f->get_uri_mapper_vit( ).

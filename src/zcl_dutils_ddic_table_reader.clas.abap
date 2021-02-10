@@ -5,7 +5,8 @@ CLASS zcl_dutils_ddic_table_reader DEFINITION
   CREATE PUBLIC .
 
   PUBLIC SECTION.
-    INTERFACES zif_dutils_ddic_table_reader.
+    INTERFACES:
+      zif_dutils_ddic_table_reader.
   PROTECTED SECTION.
   PRIVATE SECTION.
 ENDCLASS.

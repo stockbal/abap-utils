@@ -4,15 +4,17 @@ CLASS zcl_dutils_ci_run DEFINITION
   CREATE PUBLIC.
 
   PUBLIC SECTION.
-    INTERFACES zif_dutils_ci_run.
+    INTERFACES:
+      zif_dutils_ci_run.
 
-    "! <p class="shorttext synchronized" lang="en">Creates new CI Run</p>
-    METHODS constructor
-      IMPORTING
-        variant_name         TYPE sci_chkv
-        object_set           TYPE zif_dutils_ci_run=>ty_ci_object_set
-        resolve_sub_packages TYPE abap_bool
-        object_assignment    TYPE zif_dutils_ci_run=>ty_ci_object_assignment.
+    METHODS:
+      "! <p class="shorttext synchronized" lang="en">Creates new CI Run</p>
+      constructor
+        IMPORTING
+          variant_name         TYPE sci_chkv
+          object_set           TYPE zif_dutils_ci_run=>ty_ci_object_set
+          resolve_sub_packages TYPE abap_bool
+          object_assignment    TYPE zif_dutils_ci_run=>ty_ci_object_assignment.
   PROTECTED SECTION.
     METHODS:
       cleanup
@@ -49,20 +51,16 @@ CLASS zcl_dutils_ci_run DEFINITION
     METHODS:
       create_inspection
         IMPORTING
-          !object_set       TYPE REF TO cl_ci_objectset
-          !check_variant    TYPE REF TO cl_ci_checkvariant
-        RETURNING
-          VALUE(inspection) TYPE REF TO cl_ci_inspection
+          !object_set    TYPE REF TO cl_ci_objectset
+          !check_variant TYPE REF TO cl_ci_checkvariant
         RAISING
           zcx_dutils_exception,
       create_objectset
         RETURNING
-          VALUE(object_set) TYPE REF TO cl_ci_objectset
+          VALUE(result) TYPE REF TO cl_ci_objectset
         RAISING
           zcx_dutils_exception,
       run_inspection
-        IMPORTING
-          !inspection TYPE REF TO cl_ci_inspection
         RAISING
           zcx_dutils_exception.
 ENDCLASS.
@@ -72,7 +70,7 @@ ENDCLASS.
 CLASS zcl_dutils_ci_run IMPLEMENTATION.
 
   METHOD constructor.
-    me->package_reader = zcl_dutils_ddic_reader_factory=>get_package_reader( ).
+    me->package_reader = zcl_dutils_ddic_readers=>get_package_reader( ).
     me->object_set_ranges = object_set.
     me->object_assignments = object_assignment.
     me->variant_name = variant_name.
@@ -90,6 +88,7 @@ CLASS zcl_dutils_ci_run IMPLEMENTATION.
   METHOD zif_dutils_ci_run~get_duration.
     result = insp_duration.
   ENDMETHOD.
+
 
   METHOD zif_dutils_ci_run~get_results.
     results = plain_results.
@@ -116,11 +115,11 @@ CLASS zcl_dutils_ci_run IMPLEMENTATION.
         DATA(object_set) = create_objectset( ).
         DATA(check_variant) = create_variant( me->variant_name ).
 
-        me->inspection = create_inspection(
+        create_inspection(
           object_set     = object_set
           check_variant  = check_variant ).
 
-        run_inspection( me->inspection ).
+        run_inspection( ).
 
         cleanup( object_set ).
 
@@ -171,6 +170,57 @@ CLASS zcl_dutils_ci_run IMPLEMENTATION.
 
   ENDMETHOD.
 
+  METHOD create_variant.
+
+    IF variant_name IS INITIAL.
+      RAISE EXCEPTION TYPE zcx_dutils_exception
+        EXPORTING
+          text = |No check variant supplied.|.
+    ENDIF.
+
+    cl_ci_checkvariant=>get_ref(
+      EXPORTING
+        p_user                   = ''
+        p_name                   = variant_name
+      RECEIVING
+        p_ref                    = result
+      EXCEPTIONS
+        chkv_not_exists          = 1
+        missing_parameter        = 2
+        OTHERS                   = 3 ).
+
+    CASE sy-subrc.
+      WHEN 1.
+        RAISE EXCEPTION TYPE zcx_dutils_exception
+          EXPORTING
+            text = |Check variant { variant_name } doesn't exist|.
+      WHEN 2.
+        RAISE EXCEPTION TYPE zcx_dutils_exception
+          EXPORTING
+            text = |Parameter missing for check variant { variant_name }|.
+    ENDCASE.
+
+  ENDMETHOD.
+
+  METHOD skip_object.
+
+    CASE obj_info-objtype.
+
+      WHEN 'PROG'.
+
+        SELECT SINGLE subc
+          FROM trdir
+          WHERE name = @obj_info-objname
+        INTO @DATA(program_type).
+
+        result = xsdbool( program_type = 'I' ). " Include program.
+
+      WHEN OTHERS.
+        result = abap_false.
+
+    ENDCASE.
+
+  ENDMETHOD.
 
   METHOD create_inspection.
 
@@ -258,7 +308,7 @@ CLASS zcl_dutils_ci_run IMPLEMENTATION.
             p_objects           = obj_infos
             p_name              = me->inspection_name
           RECEIVING
-            p_ref               = object_set
+            p_ref               = result
           EXCEPTIONS
             objs_already_exists = 1
             locked              = 2
@@ -273,11 +323,11 @@ CLASS zcl_dutils_ci_run IMPLEMENTATION.
         ENDIF.
       ENDIF.
     ELSEIF me->object_set_ranges IS NOT INITIAL.
-      object_set = cl_ci_objectset=>create(
+      result = cl_ci_objectset=>create(
         p_user = sy-uname
         p_name = me->inspection_name
       ).
-      object_set->save_objectset(
+      result->save_objectset(
         EXPORTING
           p_tadir               = VALUE #(
             soappl = me->object_assignments-appl_comp_range
@@ -308,6 +358,7 @@ CLASS zcl_dutils_ci_run IMPLEMENTATION.
           OTHERS                = 5
       ).
       IF sy-subrc <> 0.
+        cleanup( result ).
         RAISE EXCEPTION TYPE zcx_dutils_exception
           EXPORTING
             text = |Object Set Creation failed. Subrc = { sy-subrc }|.
@@ -316,44 +367,12 @@ CLASS zcl_dutils_ci_run IMPLEMENTATION.
     ENDIF.
 
     " if no objects have been determined no inspection is possible
-    IF lines( object_set->iobjlst-objects ) = 0.
+    IF lines( result->iobjlst-objects ) = 0.
+      cleanup( result ).
       RAISE EXCEPTION TYPE zcx_dutils_exception
         EXPORTING
           text = |No Objects for checking have been determined.|.
     ENDIF.
-  ENDMETHOD.
-
-
-  METHOD create_variant.
-
-    IF variant_name IS INITIAL.
-      RAISE EXCEPTION TYPE zcx_dutils_exception
-        EXPORTING
-          text = |No check variant supplied.|.
-    ENDIF.
-
-    cl_ci_checkvariant=>get_ref(
-      EXPORTING
-        p_user                   = ''
-        p_name                   = variant_name
-      RECEIVING
-        p_ref                    = result
-      EXCEPTIONS
-        chkv_not_exists          = 1
-        missing_parameter        = 2
-        OTHERS                   = 3 ).
-
-    CASE sy-subrc.
-      WHEN 1.
-        RAISE EXCEPTION TYPE zcx_dutils_exception
-          EXPORTING
-            text = |Check variant { variant_name } doesn't exist|.
-      WHEN 2.
-        RAISE EXCEPTION TYPE zcx_dutils_exception
-          EXPORTING
-            text = |Parameter missing for check variant { variant_name }|.
-    ENDCASE.
-
   ENDMETHOD.
 
 
@@ -391,25 +410,5 @@ CLASS zcl_dutils_ci_run IMPLEMENTATION.
 
   ENDMETHOD.
 
-
-  METHOD skip_object.
-
-    CASE obj_info-objtype.
-
-      WHEN 'PROG'.
-
-        SELECT SINGLE subc
-          FROM trdir
-          WHERE name = @obj_info-objname
-        INTO @DATA(program_type).
-
-        result = xsdbool( program_type = 'I' ). " Include program.
-
-      WHEN OTHERS.
-        result = abap_false.
-
-    ENDCASE.
-
-  ENDMETHOD.
 
 ENDCLASS.

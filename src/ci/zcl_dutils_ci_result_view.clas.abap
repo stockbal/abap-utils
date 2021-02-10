@@ -5,12 +5,14 @@ CLASS zcl_dutils_ci_result_view DEFINITION
   CREATE PUBLIC .
 
   PUBLIC SECTION.
-    INTERFACES zif_dutils_ci_result_view.
+    INTERFACES:
+      zif_dutils_ci_result_view.
 
-    METHODS constructor
-      IMPORTING
-        ci_run          TYPE REF TO zif_dutils_ci_run
-        enable_adt_jump TYPE abap_bool.
+    METHODS:
+      constructor
+        IMPORTING
+          ci_run          TYPE REF TO zif_dutils_ci_run
+          enable_adt_jump TYPE abap_bool.
   PROTECTED SECTION.
   PRIVATE SECTION.
     CONSTANTS:

@@ -30,34 +30,35 @@ INTERFACE zif_dutils_ci_run
       run_loc_parallel TYPE ty_run_mode VALUE 'L',
     END OF c_run_mode .
 
-  "! <p class="shorttext synchronized" lang="en">Runs Code Inspection</p>
-  METHODS run
-    RAISING
-      zcx_dutils_exception.
+  METHODS:
+    "! <p class="shorttext synchronized" lang="en">Runs Code Inspection</p>
+    run
+      RAISING
+        zcx_dutils_exception,
 
-  "! <p class="shorttext synchronized" lang="en">Returns 'X' if inspection successful</p>
-  METHODS is_successful
-    RETURNING
-      VALUE(result) TYPE abap_bool .
+    "! <p class="shorttext synchronized" lang="en">Returns 'X' if inspection successful</p>
+    is_successful
+      RETURNING
+        VALUE(result) TYPE abap_bool,
 
-  "! <p class="shorttext synchronized" lang="en">Performs Re-Run of current Inspection</p>
-  METHODS get_results
-    RETURNING
-      VALUE(results) TYPE scit_alvlist.
+    "! <p class="shorttext synchronized" lang="en">Performs Re-Run of current Inspection</p>
+    get_results
+      RETURNING
+        VALUE(results) TYPE scit_alvlist,
 
-  "! <p class="shorttext synchronized" lang="en">Resturns 'X' if there are results</p>
-  "! Optional restriction of query is possible via the parameter IV_KIND, e.g. if only Results of type 'E'
-  "! are relevant, you should supply the parameter with the value 'E'.
-  "!
-  METHODS has_results
-    IMPORTING
-      kind          TYPE sci_errty OPTIONAL
-    RETURNING
-      VALUE(result) TYPE abap_bool.
+    "! <p class="shorttext synchronized" lang="en">Resturns 'X' if there are results</p>
+    "! Optional restriction of query is possible via the parameter IV_KIND, e.g. if only Results of type 'E'
+    "! are relevant, you should supply the parameter with the value 'E'.
+    "!
+    has_results
+      IMPORTING
+        kind          TYPE sci_errty OPTIONAL
+      RETURNING
+        VALUE(result) TYPE abap_bool,
 
-  "! <p class="shorttext synchronized" lang="en">Returns duration of inspection run</p>
-  METHODS get_duration
-    RETURNING
-      VALUE(result) TYPE i.
+    "! <p class="shorttext synchronized" lang="en">Returns duration of inspection run</p>
+    get_duration
+      RETURNING
+        VALUE(result) TYPE i.
 
 ENDINTERFACE.

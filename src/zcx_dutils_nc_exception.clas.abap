@@ -1,7 +1,7 @@
-"! <p class="shorttext synchronized" lang="en">General Exception</p>
-CLASS zcx_dutils_exception DEFINITION
+CLASS zcx_dutils_nc_exception DEFINITION
   PUBLIC
-  INHERITING FROM cx_static_check
+  INHERITING FROM cx_no_check
+  FINAL
   CREATE PUBLIC .
 
   PUBLIC SECTION.
@@ -28,7 +28,8 @@ ENDCLASS.
 
 
 
-CLASS zcx_dutils_exception IMPLEMENTATION.
+CLASS zcx_dutils_nc_exception IMPLEMENTATION.
+
 
   METHOD constructor ##ADT_SUPPRESS_GENERATION.
     DATA: fill_t100key TYPE abap_bool.
@@ -65,5 +66,4 @@ CLASS zcx_dutils_exception IMPLEMENTATION.
 
     me->previous = previous.
   ENDMETHOD.
-
 ENDCLASS.
