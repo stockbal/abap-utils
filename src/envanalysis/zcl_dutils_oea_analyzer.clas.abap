@@ -13,6 +13,7 @@ CLASS zcl_dutils_oea_analyzer DEFINITION
       "! <p class="shorttext synchronized" lang="en">Create new Analyzer instance</p>
       constructor
         IMPORTING
+          description type string
           source_objects TYPE zif_dutils_ty_global=>ty_tadir_objects
           parallel       TYPE abap_bool OPTIONAL.
   PROTECTED SECTION.
@@ -61,6 +62,8 @@ CLASS zcl_dutils_oea_analyzer IMPLEMENTATION.
   METHOD constructor.
     me->tadir_obj_data = tadir_obj_data.
     me->id = zcl_dutils_system_util=>create_sysuuid_x16( ).
+    me->analysis_info = value #(
+      description = description ).
     me->parallel = parallel.
     me->repo_reader = zcl_dutils_ddic_readers=>create_repo_reader( ).
     me->obj_env_dac = zcl_dutils_oea_dac=>get_instance( ).
@@ -84,14 +87,6 @@ CLASS zcl_dutils_oea_analyzer IMPLEMENTATION.
 
   ENDMETHOD.
 
-  METHOD zif_dutils_oea_analyzer~get_id.
-    result = me->id.
-  ENDMETHOD.
-
-  METHOD zif_dutils_oea_analyzer~set_id.
-    me->id = id.
-  ENDMETHOD.
-
   METHOD fill_analysis_info.
     GET TIME STAMP FIELD DATA(valid_to).
 
@@ -100,6 +95,7 @@ CLASS zcl_dutils_oea_analyzer IMPLEMENTATION.
       iv_seconds   = c_two_hour_validity ).
 
     me->analysis_info = VALUE zif_dutils_ty_oea=>ty_analysis_info_db(
+      base me->analysis_info
       analysis_id = me->id
       created_by  = sy-uname
       valid_to    = valid_to ).
