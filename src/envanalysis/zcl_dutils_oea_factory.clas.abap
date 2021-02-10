@@ -9,7 +9,6 @@ CLASS zcl_dutils_oea_factory DEFINITION
       "! <p class="shorttext synchronized" lang="en">Create new Object Environment Analyzer</p>
       create_analyzer
         IMPORTING
-          id             TYPE string
           source_objects TYPE zif_dutils_ty_global=>ty_tadir_objects
           parallel       TYPE abap_bool OPTIONAL
         RETURNING
@@ -50,7 +49,6 @@ CLASS zcl_dutils_oea_factory IMPLEMENTATION.
 
   METHOD create_analyzer.
     result = NEW zcl_dutils_oea_analyzer(
-      id             = id
       source_objects = source_objects
       parallel       = parallel ).
   ENDMETHOD.

@@ -13,7 +13,6 @@ CLASS zcl_dutils_oea_analyzer DEFINITION
       "! <p class="shorttext synchronized" lang="en">Create new Analyzer instance</p>
       constructor
         IMPORTING
-          id             TYPE string
           source_objects TYPE zif_dutils_ty_global=>ty_tadir_objects
           parallel       TYPE abap_bool OPTIONAL.
   PROTECTED SECTION.
@@ -60,7 +59,7 @@ CLASS zcl_dutils_oea_analyzer IMPLEMENTATION.
 
   METHOD constructor.
     me->tadir_obj_data = tadir_obj_data.
-    me->id = id.
+    me->id = zcl_dutils_system_util=>create_sysuuid_x16( ).
     me->parallel = parallel.
     me->repo_reader = zcl_dutils_ddic_readers=>create_repo_reader( ).
     me->obj_env_dac = zcl_dutils_oea_dac=>get_instance( ).
