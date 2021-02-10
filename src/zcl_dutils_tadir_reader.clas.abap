@@ -1,12 +1,12 @@
 "! <p class="shorttext synchronized" lang="en">Access to TADIR Table</p>
-CLASS zcl_dutils_ddic_repo_reader DEFINITION
+CLASS zcl_dutils_tadir_reader DEFINITION
   PUBLIC
   FINAL
   CREATE PUBLIC.
 
   PUBLIC SECTION.
     INTERFACES:
-      zif_dutils_ddic_repo_reader.
+      zif_dutils_tadir_reader.
 
     METHODS:
       constructor.
@@ -14,7 +14,7 @@ CLASS zcl_dutils_ddic_repo_reader DEFINITION
   PROTECTED SECTION.
   PRIVATE SECTION.
     DATA:
-      package_reader TYPE REF TO zif_dutils_ddic_package_reader,
+      package_reader TYPE REF TO zif_dutils_devc_reader,
       BEGIN OF where_ranges,
         name    TYPE RANGE OF tadir-obj_name,
         type    TYPE RANGE OF tadir-object,
@@ -33,13 +33,13 @@ ENDCLASS.
 
 
 
-CLASS zcl_dutils_ddic_repo_reader IMPLEMENTATION.
+CLASS zcl_dutils_tadir_reader IMPLEMENTATION.
 
   METHOD constructor.
-    me->package_reader = zcl_dutils_ddic_readers=>get_package_reader( ).
+    me->package_reader = zcl_dutils_reader_factory=>get_package_reader( ).
   ENDMETHOD.
 
-  METHOD zif_dutils_ddic_repo_reader~include_by_name.
+  METHOD zif_dutils_tadir_reader~include_by_name.
     CHECK names IS NOT INITIAL.
 
     me->where_ranges-name = VALUE #(
@@ -51,7 +51,7 @@ CLASS zcl_dutils_ddic_repo_reader IMPLEMENTATION.
     result = me.
   ENDMETHOD.
 
-  METHOD zif_dutils_ddic_repo_reader~include_by_package.
+  METHOD zif_dutils_tadir_reader~include_by_package.
     CHECK packages IS NOT INITIAL.
 
     me->where_ranges-package = VALUE #(
@@ -72,7 +72,7 @@ CLASS zcl_dutils_ddic_repo_reader IMPLEMENTATION.
     result = me.
   ENDMETHOD.
 
-  METHOD zif_dutils_ddic_repo_reader~include_by_type.
+  METHOD zif_dutils_tadir_reader~include_by_type.
     CHECK types IS NOT INITIAL.
 
     me->where_ranges-type = VALUE #(
@@ -84,7 +84,7 @@ CLASS zcl_dutils_ddic_repo_reader IMPLEMENTATION.
     result = me.
   ENDMETHOD.
 
-  METHOD zif_dutils_ddic_repo_reader~include_by_author.
+  METHOD zif_dutils_tadir_reader~include_by_author.
     CHECK authors IS NOT INITIAL.
 
     me->where_ranges-author = VALUE #(
@@ -96,7 +96,7 @@ CLASS zcl_dutils_ddic_repo_reader IMPLEMENTATION.
     result = me.
   ENDMETHOD.
 
-  METHOD zif_dutils_ddic_repo_reader~select.
+  METHOD zif_dutils_tadir_reader~select.
     build_where( ).
 
     IF me->where_clause IS INITIAL.
@@ -113,7 +113,23 @@ CLASS zcl_dutils_ddic_repo_reader IMPLEMENTATION.
     INTO CORRESPONDING FIELDS OF TABLE @result.
   ENDMETHOD.
 
-  METHOD zif_dutils_ddic_repo_reader~reset.
+  METHOD zif_dutils_tadir_reader~select_single.
+    build_where( ).
+
+    IF me->where_clause IS INITIAL.
+      RETURN.
+    ENDIF.
+
+    SELECT SINGLE object AS type,
+                  obj_name AS name,
+                  devclass AS package
+      FROM tadir
+      WHERE (me->where_clause)
+        AND delflag = @abap_false
+    INTO CORRESPONDING FIELDS OF @result.
+  ENDMETHOD.
+
+  METHOD zif_dutils_tadir_reader~reset.
     CLEAR: me->where_clause,
            me->where_ranges.
 

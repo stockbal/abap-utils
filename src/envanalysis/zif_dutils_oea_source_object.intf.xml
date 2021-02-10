@@ -19,6 +19,12 @@
     </SEOCOMPOTX>
     <SEOCOMPOTX>
      <CLSNAME>ZIF_DUTILS_OEA_SOURCE_OBJECT</CLSNAME>
+     <CMPNAME>EXISTS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Checks if the source object exists</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZIF_DUTILS_OEA_SOURCE_OBJECT</CLSNAME>
      <CMPNAME>GET_ID</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>Returns the value of the attribute &apos;id&apos;</DESCRIPT>

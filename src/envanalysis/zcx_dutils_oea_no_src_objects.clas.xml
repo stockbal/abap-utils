@@ -3,9 +3,10 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <VSEOCLASS>
-    <CLSNAME>ZCL_DUTILS_OEA_UTILS</CLSNAME>
+    <CLSNAME>ZCX_DUTILS_OEA_NO_SRC_OBJECTS</CLSNAME>
     <LANGU>E</LANGU>
-    <DESCRIPT>Utiltities for object environment analysis</DESCRIPT>
+    <DESCRIPT>No Source objects for analysis</DESCRIPT>
+    <CATEGORY>40</CATEGORY>
     <STATE>1</STATE>
     <CLSCCINCL>X</CLSCCINCL>
     <FIXPT>X</FIXPT>
@@ -13,10 +14,10 @@
    </VSEOCLASS>
    <DESCRIPTIONS>
     <SEOCOMPOTX>
-     <CLSNAME>ZCL_DUTILS_OEA_UTILS</CLSNAME>
-     <CMPNAME>GET_USED_OBJECTS</CMPNAME>
+     <CLSNAME>ZCX_DUTILS_OEA_NO_SRC_OBJECTS</CLSNAME>
+     <CMPNAME>CONSTRUCTOR</CMPNAME>
      <LANGU>E</LANGU>
-     <DESCRIPT>Determine used objects for the given object</DESCRIPT>
+     <DESCRIPT>CONSTRUCTOR</DESCRIPT>
     </SEOCOMPOTX>
    </DESCRIPTIONS>
   </asx:values>

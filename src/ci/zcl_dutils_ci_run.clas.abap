@@ -36,7 +36,7 @@ CLASS zcl_dutils_ci_run DEFINITION
           VALUE(result) TYPE abap_bool.
   PRIVATE SECTION.
     DATA:
-      package_reader       TYPE REF TO zif_dutils_ddic_package_reader,
+      package_reader       TYPE REF TO zif_dutils_devc_reader,
       inspection           TYPE REF TO cl_ci_inspection,
       inspection_name      TYPE sci_objs,
       run_mode             TYPE zif_dutils_ci_run~ty_run_mode VALUE zif_dutils_ci_run~c_run_mode-run_loc_parallel,
@@ -70,7 +70,7 @@ ENDCLASS.
 CLASS zcl_dutils_ci_run IMPLEMENTATION.
 
   METHOD constructor.
-    me->package_reader = zcl_dutils_ddic_readers=>get_package_reader( ).
+    me->package_reader = zcl_dutils_reader_factory=>get_package_reader( ).
     me->object_set_ranges = object_set.
     me->object_assignments = object_assignment.
     me->variant_name = variant_name.

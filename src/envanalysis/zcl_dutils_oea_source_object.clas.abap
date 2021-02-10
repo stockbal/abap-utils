@@ -97,6 +97,31 @@ CLASS zcl_dutils_oea_source_object IMPLEMENTATION.
     me->id = id.
   ENDMETHOD.
 
+  METHOD zif_dutils_oea_source_object~exists.
+
+    CASE me->external_type.
+
+      WHEN zif_dutils_c_object_type=>function_module.
+        result = zcl_dutils_func_util=>function_exists( CONV #( me->display_name ) ).
+
+      WHEN zif_dutils_c_tadir_type=>package.
+        " TMP packages that start with '$' are not in tadir so a packages will be handled
+        " specially
+        DATA(packages) = zcl_dutils_reader_factory=>get_package_reader( )->resolve_packages(
+          VALUE #( ( sign = 'I' option = 'EQ' low = me->display_name ) ) ).
+        result = xsdbool( lines( packages ) = 1 ).
+
+      WHEN OTHERS.
+        DATA(repo_result) = zcl_dutils_reader_factory=>create_repo_reader(
+        )->include_by_name( VALUE #( ( me->name ) )
+        )->include_by_type( VALUE #( ( me->external_type ) )
+        )->select_single( ).
+        result = xsdbool( repo_result IS NOT INITIAL ).
+
+    ENDCASE.
+
+  ENDMETHOD.
+
   METHOD zif_dutils_oea_source_object~set_generated.
     me->generated = generated.
   ENDMETHOD.
@@ -128,5 +153,6 @@ CLASS zcl_dutils_oea_source_object IMPLEMENTATION.
 
     result = me->env_service.
   ENDMETHOD.
+
 
 ENDCLASS.

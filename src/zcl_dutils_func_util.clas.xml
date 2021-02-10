@@ -3,9 +3,9 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <VSEOCLASS>
-    <CLSNAME>ZCL_DUTILS_DDIC_READER_FACTORY</CLSNAME>
+    <CLSNAME>ZCL_DUTILS_FUNC_UTIL</CLSNAME>
     <LANGU>E</LANGU>
-    <DESCRIPT>Factory for DDIC Reader classes</DESCRIPT>
+    <DESCRIPT>Util for function modules</DESCRIPT>
     <STATE>1</STATE>
     <CLSCCINCL>X</CLSCCINCL>
     <FIXPT>X</FIXPT>
@@ -13,22 +13,22 @@
    </VSEOCLASS>
    <DESCRIPTIONS>
     <SEOCOMPOTX>
-     <CLSNAME>ZCL_DUTILS_DDIC_READER_FACTORY</CLSNAME>
-     <CMPNAME>GET_PACKAGE_READER</CMPNAME>
+     <CLSNAME>ZCL_DUTILS_FUNC_UTIL</CLSNAME>
+     <CMPNAME>FUNCTION_EXISTS</CMPNAME>
      <LANGU>E</LANGU>
-     <DESCRIPT>Retrieves instance to package reader</DESCRIPT>
+     <DESCRIPT>Returns &apos;X&apos; if function module exists</DESCRIPT>
     </SEOCOMPOTX>
     <SEOCOMPOTX>
-     <CLSNAME>ZCL_DUTILS_DDIC_READER_FACTORY</CLSNAME>
-     <CMPNAME>GET_REPO_READER</CMPNAME>
+     <CLSNAME>ZCL_DUTILS_FUNC_UTIL</CLSNAME>
+     <CMPNAME>GET_FUNCTION_MODULE_INFO</CMPNAME>
      <LANGU>E</LANGU>
-     <DESCRIPT>Retrieves instance to Repository Reader</DESCRIPT>
+     <DESCRIPT>Retrieves function module information</DESCRIPT>
     </SEOCOMPOTX>
     <SEOCOMPOTX>
-     <CLSNAME>ZCL_DUTILS_DDIC_READER_FACTORY</CLSNAME>
-     <CMPNAME>GET_TABLE_READER</CMPNAME>
+     <CLSNAME>ZCL_DUTILS_FUNC_UTIL</CLSNAME>
+     <CMPNAME>GET_FUNC_MODULE_BY_INCLUDE</CMPNAME>
      <LANGU>E</LANGU>
-     <DESCRIPT>Retrieves instance to table reader</DESCRIPT>
+     <DESCRIPT>Retrieves function module info by include name</DESCRIPT>
     </SEOCOMPOTX>
    </DESCRIPTIONS>
   </asx:values>

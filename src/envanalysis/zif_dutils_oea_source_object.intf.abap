@@ -13,6 +13,11 @@ INTERFACE zif_dutils_oea_source_object
     ty_table TYPE STANDARD TABLE OF REF TO zif_dutils_oea_source_object WITH DEFAULT KEY.
 
   METHODS:
+    "! <p class="shorttext synchronized" lang="en">Checks if the source object exists</p>
+    exists
+      RETURNING
+        VALUE(result) TYPE abap_bool,
+
     "! <p class="shorttext synchronized" lang="en">Determines object environment</p>
     determine_environment,
 

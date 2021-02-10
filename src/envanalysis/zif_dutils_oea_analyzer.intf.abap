@@ -4,7 +4,9 @@ INTERFACE zif_dutils_oea_analyzer
 
   METHODS:
     "! <p class="shorttext synchronized" lang="en">Runs Analysis</p>
-    run,
+    run
+      RAISING
+        zcx_dutils_exception,
 
     "! <p class="shorttext synchronized" lang="en">Returns the result of the analysis</p>
     "!

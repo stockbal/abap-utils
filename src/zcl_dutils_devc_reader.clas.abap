@@ -1,12 +1,12 @@
-"! <p class="shorttext synchronized" lang="en">Package Utility</p>
-CLASS zcl_dutils_ddic_package_reader DEFINITION
+"! <p class="shorttext synchronized" lang="en">Access to Packages (DEVC)</p>
+CLASS zcl_dutils_devc_reader DEFINITION
   PUBLIC
   FINAL
   CREATE PUBLIC.
 
   PUBLIC SECTION.
     INTERFACES:
-      zif_dutils_ddic_package_reader.
+      zif_dutils_devc_reader.
   PROTECTED SECTION.
   PRIVATE SECTION.
     METHODS:
@@ -19,9 +19,9 @@ ENDCLASS.
 
 
 
-CLASS zcl_dutils_ddic_package_reader IMPLEMENTATION.
+CLASS zcl_dutils_devc_reader IMPLEMENTATION.
 
-  METHOD zif_dutils_ddic_package_reader~resolve_packages.
+  METHOD zif_dutils_devc_reader~resolve_packages.
     CHECK package_range IS NOT INITIAL.
 
     SELECT devclass AS name
@@ -36,11 +36,11 @@ CLASS zcl_dutils_ddic_package_reader IMPLEMENTATION.
         low    = package-name ) ).
   ENDMETHOD.
 
-  METHOD zif_dutils_ddic_package_reader~get_subpackages_by_range.
+  METHOD zif_dutils_devc_reader~get_subpackages_by_range.
     result = list_sub_packages( package_range  ).
   ENDMETHOD.
 
-  METHOD zif_dutils_ddic_package_reader~get_subpackages.
+  METHOD zif_dutils_devc_reader~get_subpackages.
     result = list_sub_packages( VALUE #( ( sign = 'I' option = 'EQ' low = to_upper( package_name ) ) ) ).
   ENDMETHOD.
 
@@ -75,7 +75,7 @@ CLASS zcl_dutils_ddic_package_reader IMPLEMENTATION.
     ENDWHILE.
   ENDMETHOD.
 
-  METHOD zif_dutils_ddic_package_reader~get_subpackages_by_tab.
+  METHOD zif_dutils_devc_reader~get_subpackages_by_tab.
     result = list_sub_packages(
       VALUE #(
         FOR pack IN package_names

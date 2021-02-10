@@ -33,15 +33,12 @@ CLASS zcl_dutils_wb_object_util DEFINITION
           name          TYPE sobj_name
           external_type TYPE trobjtype
         RETURNING
-          VALUE(result) TYPE zif_dutils_ty_global=>ty_wb_object_name.
+          VALUE(result) TYPE zif_dutils_ty_global=>ty_wb_object_name
+        RAISING
+          zcx_dutils_not_exists.
   PROTECTED SECTION.
   PRIVATE SECTION.
-    CLASS-METHODS:
-      get_fugr_from_prog
-        IMPORTING
-          program       TYPE progname
-        RETURNING
-          VALUE(result) TYPE rs38l_area.
+
 ENDCLASS.
 
 
@@ -69,10 +66,8 @@ CLASS zcl_dutils_wb_object_util IMPLEMENTATION.
 
 
   METHOD resolve_include_to_wb_object.
-    DATA: is_fugr_include     TYPE abap_bool,
-          is_functionmodule   TYPE abap_bool,
-          function_name       TYPE rs38l_fnam,
-          function_group_name TYPE rs38l_area.
+    DATA: is_fugr_include   TYPE abap_bool,
+          is_functionmodule TYPE abap_bool.
 
     CALL FUNCTION 'RS_PROGNAME_SPLIT'
       EXPORTING
@@ -90,19 +85,14 @@ CLASS zcl_dutils_wb_object_util IMPLEMENTATION.
     ENDIF.
 
     IF is_functionmodule = abap_true.
-      DATA(l_include) = include_name.
-
-      CALL FUNCTION 'FUNCTION_INCLUDE_INFO'
-        CHANGING
-          funcname = function_name
-          include  = l_include
-          group    = function_group_name
-        EXCEPTIONS
-          OTHERS   = 0.
+      TRY.
+          DATA(function_info) = zcl_dutils_func_util=>get_func_module_by_include( include_name ).
+        CATCH zcx_dutils_not_exists ##NO_HANDLER.
+      ENDTRY.
 
       wb_object-sub_type = swbm_c_type_function.
-      wb_object-name = function_group_name.
-      wb_object-display_name = function_name.
+      wb_object-name = function_info-group.
+      wb_object-display_name = function_info-name.
     ELSE.
       wb_object-sub_type = swbm_c_type_prg_include.
       wb_object-name =
@@ -115,10 +105,9 @@ CLASS zcl_dutils_wb_object_util IMPLEMENTATION.
 
         " Currently only Function modules receive special handling
       WHEN zif_dutils_c_object_type=>function_module.
-        SELECT SINGLE pname FROM tfdir WHERE funcname = @name INTO @DATA(prog_of_fugr).
         result = VALUE #(
           display_name = name
-          name         = get_fugr_from_prog( prog_of_fugr ) ).
+          name         = zcl_dutils_func_util=>get_function_module_info( CONV #( name ) )-group ).
 
       WHEN OTHERS.
         result = VALUE #(
@@ -126,16 +115,6 @@ CLASS zcl_dutils_wb_object_util IMPLEMENTATION.
           name         = name ).
 
     ENDCASE.
-  ENDMETHOD.
-
-  METHOD get_fugr_from_prog.
-    CALL FUNCTION 'FUNCTION_INCLUDE_SPLIT'
-      EXPORTING
-        program = program
-      IMPORTING
-        group   = result
-      EXCEPTIONS
-        OTHERS  = 1.
   ENDMETHOD.
 
 ENDCLASS.

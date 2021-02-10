@@ -3,9 +3,9 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <VSEOCLASS>
-    <CLSNAME>ZCL_DUTILS_DDIC_TABLE_READER</CLSNAME>
+    <CLSNAME>ZCL_DUTILS_TADIR_READER</CLSNAME>
     <LANGU>E</LANGU>
-    <DESCRIPT>Access to Table DD02L (SAP Tables)</DESCRIPT>
+    <DESCRIPT>Access to TADIR Table</DESCRIPT>
     <STATE>1</STATE>
     <CLSCCINCL>X</CLSCCINCL>
     <FIXPT>X</FIXPT>

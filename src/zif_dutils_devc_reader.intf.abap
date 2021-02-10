@@ -1,5 +1,5 @@
-"! <p class="shorttext synchronized" lang="en">Package Utility</p>
-INTERFACE zif_dutils_ddic_package_reader
+"! <p class="shorttext synchronized" lang="en">Access to Packages (DEVC)</p>
+INTERFACE zif_dutils_devc_reader
   PUBLIC .
   METHODS:
     "! <p class="shorttext synchronized" lang="en">Resolves full package names from Range Table</p>

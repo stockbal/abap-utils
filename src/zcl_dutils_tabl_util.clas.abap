@@ -1,20 +1,24 @@
-"! <p class="shorttext synchronized" lang="en">Access to Table DD02L (SAP Tables)</p>
-CLASS zcl_dutils_ddic_table_reader DEFINITION
+"! <p class="shorttext synchronized" lang="en">DDIC Table util</p>
+CLASS zcl_dutils_tabl_util DEFINITION
   PUBLIC
   FINAL
   CREATE PUBLIC .
 
   PUBLIC SECTION.
-    INTERFACES:
-      zif_dutils_ddic_table_reader.
+    CLASS-METHODS:
+      "! <p class="shorttext synchronized" lang="en">Retrieves workbench type of given table</p>
+      get_table_wb_type
+        IMPORTING
+          table_name    TYPE tabname
+        RETURNING
+          VALUE(result) TYPE seu_objtyp.
   PROTECTED SECTION.
   PRIVATE SECTION.
 ENDCLASS.
 
+CLASS zcl_dutils_tabl_util IMPLEMENTATION.
 
-CLASS zcl_dutils_ddic_table_reader IMPLEMENTATION.
-
-  METHOD zif_dutils_ddic_table_reader~get_table_wb_type.
+  METHOD get_table_wb_type.
     SELECT SINGLE tabclass
       FROM dd02l
       WHERE tabname = @table_name

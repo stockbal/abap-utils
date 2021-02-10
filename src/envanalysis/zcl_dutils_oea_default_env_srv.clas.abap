@@ -12,20 +12,15 @@ CLASS zcl_dutils_oea_default_env_srv DEFINITION
       constructor.
   PROTECTED SECTION.
   PRIVATE SECTION.
-    DATA:
-      oea_utils TYPE REF TO zif_dutils_oea_utils.
 ENDCLASS.
-
-
 
 CLASS zcl_dutils_oea_default_env_srv IMPLEMENTATION.
 
   METHOD constructor.
-    me->oea_utils = zcl_dutils_oea_utils=>get_instance( ).
   ENDMETHOD.
 
   METHOD zif_dutils_oea_env_service~determine_used_objects.
-    DATA(used_objects_data) = me->oea_utils->get_used_objects(
+    DATA(used_objects_data) = zcl_dutils_oea_utils=>get_used_objects(
       object          = object
       with_parameters = abap_true ).
 

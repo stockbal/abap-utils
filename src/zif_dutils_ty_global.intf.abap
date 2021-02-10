@@ -17,6 +17,13 @@ INTERFACE zif_dutils_ty_global
       package TYPE devclass,
     END OF ty_tadir_object,
 
+    "! Information about function module
+    BEGIN OF ty_function_info,
+      name    TYPE tfdir-funcname,
+      group   TYPE rs38l_area,
+      include TYPE tfdir-pname,
+    END OF ty_function_info,
+
     "! Range of UUID C32
     ty_uuid_c32_range           TYPE RANGE OF sysuuid_c32,
 

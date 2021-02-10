@@ -13,7 +13,7 @@ CLASS zcl_dutils_oea_analyzer DEFINITION
       "! <p class="shorttext synchronized" lang="en">Create new Analyzer instance</p>
       constructor
         IMPORTING
-          description type string
+          description    TYPE string
           source_objects TYPE zif_dutils_ty_global=>ty_tadir_objects
           parallel       TYPE abap_bool OPTIONAL.
   PROTECTED SECTION.
@@ -22,14 +22,15 @@ CLASS zcl_dutils_oea_analyzer DEFINITION
       c_two_hour_validity TYPE timestamp VALUE 7200.
 
     DATA:
-      id                  TYPE sysuuid_x16,
-      tadir_obj_data      TYPE zif_dutils_ty_global=>ty_tadir_objects,
-      source_objects_flat TYPE zif_dutils_ty_oea=>ty_source_objects_ext,
-      source_objects      TYPE zif_dutils_oea_source_object=>ty_table,
-      parallel            TYPE abap_bool,
-      repo_reader         TYPE REF TO zif_dutils_ddic_repo_reader,
-      obj_env_dac         TYPE REF TO zif_dutils_oea_dac,
-      analysis_info       TYPE zif_dutils_ty_oea=>ty_analysis_info_db.
+      id                   TYPE sysuuid_x16,
+      tadir_obj_data       TYPE zif_dutils_ty_global=>ty_tadir_objects,
+      source_objects_flat  TYPE zif_dutils_ty_oea=>ty_source_objects_ext,
+      source_objects       TYPE zif_dutils_oea_source_object=>ty_table,
+      parallel             TYPE abap_bool,
+      repo_reader          TYPE REF TO zif_dutils_tadir_reader,
+      obj_env_dac          TYPE REF TO zif_dutils_oea_dac,
+      analysis_info        TYPE zif_dutils_ty_oea=>ty_analysis_info_db,
+      analyzed_with_errors TYPE abap_bool.
 
     METHODS:
       "! <p class="shorttext synchronized" lang="en">Fills analysis information</p>
@@ -37,7 +38,9 @@ CLASS zcl_dutils_oea_analyzer DEFINITION
       "! <p class="shorttext synchronized" lang="en">Resolves source object - if needed</p>
       "! Objects of type DEVC cannot be used directly. Instead all objects belonging to the
       "! package are used as source objects.
-      resolve_source_objects,
+      resolve_source_objects
+        RAISING
+          zcx_dutils_exception,
       "! <p class="shorttext synchronized" lang="en">Persists all source objects</p>
       persist_src_objects,
       is_parallel_active
@@ -62,21 +65,27 @@ CLASS zcl_dutils_oea_analyzer IMPLEMENTATION.
   METHOD constructor.
     me->tadir_obj_data = tadir_obj_data.
     me->id = zcl_dutils_system_util=>create_sysuuid_x16( ).
-    me->analysis_info = value #(
+    me->analysis_info = VALUE #(
       description = description ).
     me->parallel = parallel.
-    me->repo_reader = zcl_dutils_ddic_readers=>create_repo_reader( ).
+    me->repo_reader = zcl_dutils_reader_factory=>create_repo_reader( ).
     me->obj_env_dac = zcl_dutils_oea_dac=>get_instance( ).
     me->tadir_obj_data = source_objects.
   ENDMETHOD.
 
   METHOD zif_dutils_oea_analyzer~run.
-    fill_analysis_info( ).
-    resolve_source_objects( ).
 
-    analyze( ).
+    TRY.
+        fill_analysis_info( ).
+        resolve_source_objects( ).
+        analyze( ).
 
-    COMMIT WORK.
+        COMMIT WORK.
+      CATCH zcx_dutils_exception INTO DATA(error).
+        ROLLBACK WORK.
+        RAISE EXCEPTION error.
+    ENDTRY.
+
   ENDMETHOD.
 
   METHOD zif_dutils_oea_analyzer_par~run.
@@ -95,7 +104,7 @@ CLASS zcl_dutils_oea_analyzer IMPLEMENTATION.
       iv_seconds   = c_two_hour_validity ).
 
     me->analysis_info = VALUE zif_dutils_ty_oea=>ty_analysis_info_db(
-      base me->analysis_info
+      BASE me->analysis_info
       analysis_id = me->id
       created_by  = sy-uname
       valid_to    = valid_to ).
@@ -110,7 +119,13 @@ CLASS zcl_dutils_oea_analyzer IMPLEMENTATION.
           DATA(source_obj) = zcl_dutils_oea_factory=>create_source_object(
             name          = tadir_obj_data-name
             external_type = tadir_obj_data-type ).
-        CATCH zcx_dutils_oea_no_type.
+          IF NOT source_obj->exists( ).
+            RAISE EXCEPTION TYPE zcx_dutils_not_exists
+              EXPORTING
+                text = |Object with name { tadir_obj_data-name } | &&
+                       |and type { tadir_obj_data-type } does not exist|.
+          ENDIF.
+        CATCH zcx_dutils_no_wb_type.
           " source object is not usable, so skip it
           CONTINUE.
       ENDTRY.
@@ -127,6 +142,11 @@ CLASS zcl_dutils_oea_analyzer IMPLEMENTATION.
 
     ENDLOOP.
 
+    IF me->source_objects IS INITIAL.
+      RAISE EXCEPTION TYPE zcx_dutils_exception
+        EXPORTING
+          text = |No Source objects could be resolved|.
+    ENDIF.
   ENDMETHOD.
 
   METHOD derive_src_objects.
@@ -142,7 +162,8 @@ CLASS zcl_dutils_oea_analyzer IMPLEMENTATION.
           DATA(derived_src_obj) = zcl_dutils_oea_factory=>create_source_object(
             name          = <derived_object>-name
             external_type = <derived_object>-type ).
-        CATCH zcx_dutils_oea_no_type.
+        CATCH zcx_dutils_no_wb_type
+              zcx_dutils_not_exists.
           " source object is not usable, so skip it
           CONTINUE.
       ENDTRY.
