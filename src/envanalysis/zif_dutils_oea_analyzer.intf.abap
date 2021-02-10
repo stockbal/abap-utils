@@ -21,5 +21,10 @@ INTERFACE zif_dutils_oea_analyzer
     "! @parameter result | Result of object analysis
     get_result
       RETURNING
-        VALUE(result) TYPE zif_dutils_ty_oea=>ty_used_objects.
+        VALUE(result) TYPE zif_dutils_ty_oea=>ty_used_objects,
+
+    "! <p class="shorttext synchronized" lang="en">Returns duration of analysis</p>
+    get_duration
+      RETURNING
+        VALUE(result) TYPE timestamp.
 ENDINTERFACE.

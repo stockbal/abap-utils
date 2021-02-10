@@ -27,7 +27,8 @@ CLASS zcl_dutils_oea_analyzer DEFINITION
       source_objects      TYPE zif_dutils_oea_source_object=>ty_table,
       parallel            TYPE abap_bool,
       repo_reader         TYPE REF TO zif_dutils_ddic_repo_reader,
-      obj_env_dac         TYPE REF TO zif_dutils_oea_dac.
+      obj_env_dac         TYPE REF TO zif_dutils_oea_dac,
+      analysis_info       TYPE zif_dutils_ty_oea=>ty_analysis_info_db.
 
     METHODS:
       "! <p class="shorttext synchronized" lang="en">Fills analysis information</p>
@@ -98,12 +99,10 @@ CLASS zcl_dutils_oea_analyzer IMPLEMENTATION.
       iv_timestamp = valid_to
       iv_seconds   = c_two_hour_validity ).
 
-    me->id = zcl_dutils_system_util=>create_sysuuid_x16( ).
-
-    me->obj_env_dac->insert_analysis_info( VALUE #(
+    me->analysis_info = VALUE zif_dutils_ty_oea=>ty_analysis_info_db(
       analysis_id = me->id
       created_by  = sy-uname
-      valid_to    = valid_to ) ).
+      valid_to    = valid_to ).
 
   ENDMETHOD.
 
@@ -168,6 +167,7 @@ CLASS zcl_dutils_oea_analyzer IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD analyze.
+    GET TIME STAMP FIELD DATA(start_time).
 
     DATA(is_parallel) = is_parallel_active( ).
 
@@ -183,6 +183,14 @@ CLASS zcl_dutils_oea_analyzer IMPLEMENTATION.
       DELETE me->source_objects.
     ENDLOOP.
 
+    GET TIME STAMP FIELD DATA(end_time).
+
+    me->analysis_info-duration = cl_abap_timestamp_util=>get_instance( )->tstmp_seconds_between(
+      iv_timestamp0 = start_time
+      iv_timestamp1 = end_time ).
+
+    me->obj_env_dac->insert_analysis_info( me->analysis_info ).
+
   ENDMETHOD.
 
   METHOD is_parallel_active.
@@ -197,6 +205,10 @@ CLASS zcl_dutils_oea_analyzer IMPLEMENTATION.
     source_object->determine_environment( ).
     source_object->persist( me->id ).
     source_object->set_processing( abap_false ).
+  ENDMETHOD.
+
+  METHOD zif_dutils_oea_analyzer~get_duration.
+    result = me->analysis_info-duration.
   ENDMETHOD.
 
 ENDCLASS.
