@@ -3,16 +3,6 @@ INTERFACE zif_dutils_oea_analyzer
   PUBLIC .
 
   METHODS:
-    "! <p class="shorttext synchronized" lang="en">Returns ID of analyzer</p>
-    get_id
-      RETURNING
-        VALUE(result) TYPE sysuuid_c32,
-
-    "! <p class="shorttext synchronized" lang="en">Sets ID of analyzer</p>
-    set_id
-      IMPORTING
-        id TYPE sysuuid_c32,
-
     "! <p class="shorttext synchronized" lang="en">Runs Analysis</p>
     run,
 
