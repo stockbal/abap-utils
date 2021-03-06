@@ -76,9 +76,12 @@ CLASS zcl_dutils_adt_obj_util DEFINITION
     CONSTANTS:
       BEGIN OF c_error_messages,
         wb_request_not_created TYPE string VALUE 'Workbench Request object could not be created' ##NO_TEXT,
-      END OF c_error_messages,
-      c_segw_project_uri_pattern TYPE string VALUE '/sap/bc/adt/vit/gw/sb/project/',
+      END OF c_error_messages.
 
+    CONSTANTS:
+      c_segw_project_uri_pattern TYPE string VALUE '/sap/bc/adt/vit/gw/sb/project/'.
+
+    CONSTANTS:
       BEGIN OF c_adt_types,
         function_module TYPE trobjtype VALUE 'FUNC',
         function_group  TYPE trobjtype VALUE 'FUGR',

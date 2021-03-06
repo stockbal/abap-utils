@@ -7,8 +7,9 @@ INTERFACE zif_dutils_c_oea
     BEGIN OF c_aggregation_level,
       by_type           TYPE zif_dutils_ty_oea=>ty_aggregation_level VALUE '1',
       by_calling_object TYPE zif_dutils_ty_oea=>ty_aggregation_level VALUE '2',
-    END OF c_aggregation_level,
+    END OF c_aggregation_level.
 
+  CONSTANTS:
     "! <p class="shorttext synchronized" lang="en">Mode for object environment analysis</p>
     BEGIN OF c_analysis_mode,
       "! Analysis of used objects

@@ -3,7 +3,9 @@ INTERFACE zif_dutils_ci_run
   PUBLIC .
   TYPES:
     "! <p class="shorttext synchronized" lang="en">Run mode for CI</p>
-    ty_run_mode TYPE c LENGTH 1,
+    ty_run_mode TYPE c LENGTH 1.
+
+  TYPES:
     "! <p class="shorttext synchronized" lang="en">Object Set for CI</p>
     BEGIN OF ty_ci_object_set,
       class_range          TYPE zif_dutils_ty_global=>ty_class_intf_range,
@@ -12,7 +14,8 @@ INTERFACE zif_dutils_ci_run
       wdyn_comp_name_range TYPE zif_dutils_ty_global=>ty_wdyn_comp_name_range,
       ddic_type_range      TYPE zif_dutils_ty_global=>ty_ddic_type_range,
       type_group_range     TYPE zif_dutils_ty_global=>ty_type_group_range,
-    END OF ty_ci_object_set,
+    END OF ty_ci_object_set.
+  TYPES:
     "! <p class="shorttext synchronized" lang="en">Object Assignments for CI</p>
     BEGIN OF ty_ci_object_assignment,
       package_range         TYPE zif_dutils_ty_global=>ty_package_name_range,
@@ -47,9 +50,8 @@ INTERFACE zif_dutils_ci_run
         VALUE(results) TYPE scit_alvlist,
 
     "! <p class="shorttext synchronized" lang="en">Resturns 'X' if there are results</p>
-    "! Optional restriction of query is possible via the parameter IV_KIND, e.g. if only Results of type 'E'
-    "! are relevant, you should supply the parameter with the value 'E'.
-    "!
+    "! Optional restriction of query is possible via the parameter IV_KIND, e,g, if only Results of type 'E'
+    "! are relevant, you should supply the parameter with the value 'E'
     has_results
       IMPORTING
         kind          TYPE sci_errty OPTIONAL

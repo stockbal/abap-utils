@@ -6,7 +6,7 @@ CLASS zcl_dutils_oea_dac DEFINITION
 
   PUBLIC SECTION.
     INTERFACES:
-      zif_dutils_oea_dac .
+      zif_dutils_oea_dac.
 
     CLASS-METHODS:
       get_instance

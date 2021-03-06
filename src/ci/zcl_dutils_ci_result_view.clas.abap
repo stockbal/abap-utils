@@ -22,7 +22,8 @@ CLASS zcl_dutils_ci_result_view DEFINITION
         only_errors   TYPE ui_func VALUE 'ERRORS',
         only_warnings TYPE ui_func VALUE 'WARNINGS',
         only_infos    TYPE ui_func VALUE 'INFOS',
-      END OF c_functions,
+      END OF c_functions.
+    CONSTANTS:
       BEGIN OF c_fields,
         kind            TYPE salv_de_column VALUE 'KIND',
         kind_icon       TYPE salv_de_column VALUE 'KIND_ICON',
@@ -77,16 +78,16 @@ CLASS zcl_dutils_ci_result_view DEFINITION
           row TYPE i,
       set_list_header,
       on_user_command
-          FOR EVENT added_function OF cl_salv_events
+        FOR EVENT added_function OF cl_salv_events
         IMPORTING
           e_salv_function,
       on_link_click
-          FOR EVENT link_click OF cl_salv_events_table
+        FOR EVENT link_click OF cl_salv_events_table
         IMPORTING
           column
           row,
       on_double_click
-          FOR EVENT double_click OF cl_salv_events_table
+        FOR EVENT double_click OF cl_salv_events_table
         IMPORTING
           column
           row.

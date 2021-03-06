@@ -21,14 +21,14 @@ CLASS zcl_dutils_ci_run DEFINITION
         IMPORTING
           !object_set TYPE REF TO cl_ci_objectset
         RAISING
-          zcx_dutils_exception ,
+          zcx_dutils_exception,
       create_variant
         IMPORTING
           !variant_name TYPE sci_chkv
         RETURNING
           VALUE(result) TYPE REF TO cl_ci_checkvariant
         RAISING
-          zcx_dutils_exception ,
+          zcx_dutils_exception,
       skip_object
         IMPORTING
           !obj_info     TYPE scir_objs

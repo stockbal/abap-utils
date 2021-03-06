@@ -15,13 +15,14 @@ CLASS zcl_dutils_tadir_reader DEFINITION
   PRIVATE SECTION.
     DATA:
       package_reader TYPE REF TO zif_dutils_devc_reader,
+      where_clause   TYPE TABLE OF string.
+    DATA:
       BEGIN OF where_ranges,
         name    TYPE RANGE OF tadir-obj_name,
         type    TYPE RANGE OF tadir-object,
         package TYPE RANGE OF tadir-devclass,
         author  TYPE RANGE OF tadir-author,
-      END OF where_ranges,
-      where_clause TYPE TABLE OF string.
+      END OF where_ranges.
 
     METHODS:
       build_where,

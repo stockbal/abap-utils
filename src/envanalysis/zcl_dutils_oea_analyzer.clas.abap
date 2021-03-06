@@ -36,8 +36,8 @@ CLASS zcl_dutils_oea_analyzer DEFINITION
       "! <p class="shorttext synchronized" lang="en">Fills analysis information</p>
       fill_analysis_info,
       "! <p class="shorttext synchronized" lang="en">Resolves source object - if needed</p>
-      "! Objects of type DEVC cannot be used directly. Instead all objects belonging to the
-      "! package are used as source objects.
+      "! Objects of type DEVC cannot be used directly, Instead all objects belonging to the
+      "! package are used as source objects,
       resolve_source_objects
         RAISING
           zcx_dutils_exception,

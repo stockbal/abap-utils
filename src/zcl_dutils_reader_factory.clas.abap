@@ -38,7 +38,7 @@ CLASS zcl_dutils_reader_factory IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD create_repo_reader.
-    result = new zcl_dutils_tadir_reader( ).
+    result = NEW zcl_dutils_tadir_reader( ).
   ENDMETHOD.
 
   METHOD get_table_reader.

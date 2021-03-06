@@ -8,22 +8,25 @@ INTERFACE zif_dutils_ty_global
       "! Name in TADIR
       name         TYPE sobj_name,
       display_name TYPE sobj_name,
-    END OF ty_wb_object_name,
+    END OF ty_wb_object_name.
 
+  TYPES:
     "! Information about object that needs to be checked
     BEGIN OF ty_tadir_object,
       name    TYPE sobj_name,
       type    TYPE trobjtype,
       package TYPE devclass,
-    END OF ty_tadir_object,
+    END OF ty_tadir_object.
 
+  TYPES:
     "! Information about function module
     BEGIN OF ty_function_info,
       name    TYPE tfdir-funcname,
       group   TYPE rs38l_area,
       include TYPE tfdir-pname,
-    END OF ty_function_info,
+    END OF ty_function_info.
 
+  TYPES:
     "! Range of UUID C32
     ty_uuid_c32_range           TYPE RANGE OF sysuuid_c32,
 
@@ -90,7 +93,7 @@ INTERFACE zif_dutils_ty_global
   "! Workbench object data
   TYPES BEGIN OF ty_wb_object.
   "! Type for TADIR
-  TYPES type     TYPE trobjtype.
+  TYPES type TYPE trobjtype.
   TYPES sub_type TYPE seu_objtyp.
   INCLUDE TYPE ty_wb_object_name.
   TYPES END OF ty_wb_object.

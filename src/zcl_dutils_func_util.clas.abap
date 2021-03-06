@@ -62,7 +62,7 @@ CLASS zcl_dutils_func_util IMPLEMENTATION.
         function_not_exist = 1
         OTHERS             = 2.
     IF sy-subrc <> 0.
-      clear result.
+      CLEAR result.
       RAISE EXCEPTION TYPE zcx_dutils_not_exists
         EXPORTING
           text = |Function module { function_module } does not exist|.

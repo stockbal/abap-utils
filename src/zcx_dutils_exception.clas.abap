@@ -7,7 +7,7 @@ CLASS zcx_dutils_exception DEFINITION
   PUBLIC SECTION.
 
     INTERFACES:
-      if_t100_message .
+      if_t100_message.
 
     DATA:
       msgv1 TYPE sy-msgv1,
@@ -21,7 +21,6 @@ CLASS zcx_dutils_exception DEFINITION
         IMPORTING
           previous LIKE previous OPTIONAL
           text     TYPE string OPTIONAL.
-
   PROTECTED SECTION.
   PRIVATE SECTION.
 ENDCLASS.

@@ -4,10 +4,11 @@ CLASS zcl_dutils_system_util DEFINITION
   CREATE PUBLIC .
 
   PUBLIC SECTION.
-    "! <p class="shorttext synchronized" lang="en">Creates x16 UUID</p>
-    CLASS-METHODS create_sysuuid_x16
-      RETURNING
-        VALUE(result) TYPE sysuuid_x16.
+    CLASS-METHODS:
+      "! <p class="shorttext synchronized" lang="en">Creates x16 UUID</p>
+      create_sysuuid_x16
+        RETURNING
+          VALUE(result) TYPE sysuuid_x16.
   PROTECTED SECTION.
   PRIVATE SECTION.
 ENDCLASS.
