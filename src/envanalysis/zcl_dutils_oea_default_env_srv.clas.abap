@@ -21,7 +21,9 @@ CLASS zcl_dutils_oea_default_env_srv IMPLEMENTATION.
 
   METHOD zif_dutils_oea_env_service~determine_used_objects.
     DATA(used_objects_data) = zcl_dutils_oea_utils=>get_used_objects(
-      object          = object
+      object          = value #(
+        name = name
+        type = external_type )
       with_parameters = abap_true ).
 
     LOOP AT used_objects_data ASSIGNING FIELD-SYMBOL(<used_object_data>).

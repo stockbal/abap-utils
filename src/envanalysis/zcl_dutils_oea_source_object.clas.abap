@@ -84,9 +84,9 @@ CLASS zcl_dutils_oea_source_object IMPLEMENTATION.
 
   METHOD zif_dutils_oea_source_object~determine_environment.
     me->used_objects = get_env_service( )->determine_used_objects(
-      object = VALUE #(
-        name = me->display_name
-        type = me->external_type ) ).
+      display_name  = CONV #( me->display_name )
+      name          = me->name
+      external_type = me->external_type ).
   ENDMETHOD.
 
   METHOD zif_dutils_oea_source_object~set_parent_ref.

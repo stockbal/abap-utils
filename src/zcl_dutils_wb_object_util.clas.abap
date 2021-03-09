@@ -19,26 +19,14 @@ CLASS zcl_dutils_wb_object_util DEFINITION
           include_name     TYPE progname
         RETURNING
           VALUE(wb_object) TYPE zif_dutils_ty_global=>ty_wb_object,
-
       "! <p class="shorttext synchronized" lang="en">Retrieves full workbench type for given type</p>
       get_full_wb_object_type
         IMPORTING
           type          TYPE seu_obj
         RETURNING
-          VALUE(result) TYPE wbobjtype,
-
-      "! <p class="shorttext synchronized" lang="en">Determines full workbench object name</p>
-      determine_wb_obj_name
-        IMPORTING
-          name          TYPE sobj_name
-          external_type TYPE trobjtype
-        RETURNING
-          VALUE(result) TYPE zif_dutils_ty_global=>ty_wb_object_name
-        RAISING
-          zcx_dutils_not_exists.
+          VALUE(result) TYPE wbobjtype.
   PROTECTED SECTION.
   PRIVATE SECTION.
-
 ENDCLASS.
 
 
@@ -98,23 +86,6 @@ CLASS zcl_dutils_wb_object_util IMPLEMENTATION.
       wb_object-name =
       wb_object-display_name = include_name.
     ENDIF.
-  ENDMETHOD.
-
-  METHOD determine_wb_obj_name.
-    CASE external_type.
-
-        " Currently only Function modules receive special handling
-      WHEN zif_dutils_c_object_type=>function_module.
-        result = VALUE #(
-          display_name = name
-          name         = zcl_dutils_func_util=>get_function_module_info( CONV #( name ) )-group ).
-
-      WHEN OTHERS.
-        result = VALUE #(
-          display_name = name
-          name         = name ).
-
-    ENDCASE.
   ENDMETHOD.
 
 ENDCLASS.

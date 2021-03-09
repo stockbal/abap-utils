@@ -18,13 +18,19 @@ ENDCLASS.
 
 
 
-CLASS ZCL_DUTILS_OEA_ENV_SRV_FACTORY IMPLEMENTATION.
+CLASS zcl_dutils_oea_env_srv_factory IMPLEMENTATION.
 
   METHOD create_env_service.
     CASE obj_type.
 
       WHEN zif_dutils_c_tadir_type=>business_object.
         result = NEW zcl_dutils_oea_bobf_env_srv( ).
+
+      WHEN zif_dutils_c_tadir_type=>icf_node.
+        result = NEW zcl_dutils_oea_sicf_env_srv( ).
+
+      WHEN zif_dutils_c_tadir_type=>gw_project.
+        result = NEW zcl_dutils_oea_iwpr_env_srv( ).
 
       WHEN OTHERS.
         result = NEW zcl_dutils_oea_default_env_srv( ).
