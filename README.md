@@ -1,3 +1,4 @@
+![](https://img.shields.io/badge/ABAP-v740sp08+-orange)
 # abap-utils
 
 Utilities for ABAP Development
@@ -18,7 +19,3 @@ Utilities for ABAP Development
 ## Installation
 
 Install this repository using [abapGit](https://github.com/abapGit/abapGit#abapgit).
-
-### SAP NetWeaver compatibility
-
-This repository is compatible with NW 7.40 SP08 and greater
