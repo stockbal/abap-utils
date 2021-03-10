@@ -9,6 +9,8 @@ CLASS zcl_dutils_oea_iwpr_env_srv DEFINITION
       zif_dutils_oea_env_service .
   PROTECTED SECTION.
   PRIVATE SECTION.
+    CONSTANTS:
+      c_sadl_model_exp_data_intf TYPE string VALUE 'IF_SADL_GW_MODEL_EXPOSURE_DATA'.
     TYPES:
       BEGIN OF ty_generated_obj,
         tadir_type   TYPE trobjtype,
@@ -81,6 +83,20 @@ CLASS zcl_dutils_oea_iwpr_env_srv IMPLEMENTATION.
           model_exposure  TYPE REF TO object,
           model_provider  TYPE REF TO object,
           sadl_definition TYPE if_sadl_types=>ty_sadl_definition.
+
+    cl_abap_typedescr=>describe_by_name(
+      EXPORTING  p_name         = mpc_name
+      RECEIVING  p_descr_ref    = DATA(type_descr)
+      EXCEPTIONS type_not_found = 1 ).
+    IF sy-subrc <> 0 or type_descr->kind <> cl_abap_typedescr=>kind_class.
+      RETURN.
+    ENDIF.
+
+    DATA(mpc_cls_descr) = CAST cl_abap_classdescr( type_descr ).
+
+    IF NOT line_exists( mpc_cls_descr->interfaces[ name = c_sadl_model_exp_data_intf ] ).
+      RETURN.
+    ENDIF.
 
     TRY.
         CREATE OBJECT mpc TYPE (mpc_name).
