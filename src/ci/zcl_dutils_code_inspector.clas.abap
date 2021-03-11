@@ -53,17 +53,30 @@ CLASS zcl_dutils_code_inspector IMPLEMENTATION.
 
     cl_ci_checkvariant=>get_ref(
       EXPORTING
-        p_user                   = ''
-        p_name                   = check_variant_name
+        p_user            = space
+        p_name            = check_variant_name
+      RECEIVING
+        p_ref             = DATA(check_variant)
       EXCEPTIONS
-        chkv_not_exists          = 1
-        missing_parameter        = 2
-        OTHERS                   = 3 ).
+        chkv_not_exists   = 1
+        missing_parameter = 2
+        OTHERS            = 3 ).
 
     IF sy-subrc <> 0.
       RAISE EXCEPTION TYPE zcx_dutils_exception
         EXPORTING
           text = |No valid check variant { check_variant_name  }|.
+    ELSE. " validate if check variant can be used
+      check_variant->verify(
+        EXPORTING p_srcid    = VALUE #( )
+        IMPORTING p_messages = DATA(verifition_msgs) ).
+
+      ASSIGN verifition_msgs[ kind = 'E' ] TO FIELD-SYMBOL(<error_msg>).
+      IF sy-subrc = 0.
+        RAISE EXCEPTION TYPE zcx_dutils_exception
+          EXPORTING
+            text = CONV #( <error_msg>-text ).
+      ENDIF.
     ENDIF.
 
   ENDMETHOD.
