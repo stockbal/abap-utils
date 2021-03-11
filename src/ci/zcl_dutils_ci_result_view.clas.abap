@@ -27,6 +27,8 @@ CLASS zcl_dutils_ci_result_view DEFINITION
       BEGIN OF c_fields,
         kind            TYPE salv_de_column VALUE 'KIND',
         kind_icon       TYPE salv_de_column VALUE 'KIND_ICON',
+        object_type     TYPE salv_de_column VALUE 'OBJTYPE',
+        object_name     TYPE salv_de_column VALUE 'OBJNAME',
         sub_object_type TYPE salv_de_column VALUE 'SOBJTYPE',
         sub_object_name TYPE salv_de_column VALUE 'SOBJNAME',
         text            TYPE salv_de_column VALUE 'TEXT',
@@ -106,7 +108,7 @@ CLASS zcl_dutils_ci_result_view IMPLEMENTATION.
     process_results( ).
     TRY.
         create_alv( ).
-      CATCH cx_salv_msg cx_salv_existing cx_salv_wrong_call.
+      CATCH cx_salv_error ##NO_HANDLER.
     ENDTRY.
   ENDMETHOD.
 
@@ -158,6 +160,23 @@ CLASS zcl_dutils_ci_result_view IMPLEMENTATION.
         set_functions = cl_salv_table=>c_functions_all
     ).
 
+    DATA(sorts) = me->ci_result_alv->get_sorts( ).
+    TRY.
+        sorts->add_sort(
+          columnname = c_fields-kind
+          position   = 1
+          sequence   = if_salv_c_sort=>sort_up ).
+        sorts->add_sort(
+          columnname = c_fields-object_type
+          position   = 2
+          sequence   = if_salv_c_sort=>sort_up ).
+        sorts->add_sort(
+          columnname = c_fields-object_name
+          position   = 3
+          sequence   = if_salv_c_sort=>sort_up ).
+      CATCH cx_salv_error ##NO_HANDLER.
+    ENDTRY.
+
     DATA(events) = me->ci_result_alv->get_event( ).
     SET HANDLER:
       on_user_command FOR events,
@@ -190,9 +209,7 @@ CLASS zcl_dutils_ci_result_view IMPLEMENTATION.
           TRY.
               filters->add_filter( columnname = c_fields-kind
                                    low        = CONV #( kind ) ).
-            CATCH cx_salv_data_error
-                  cx_salv_not_found
-                  cx_salv_existing INTO DATA(salv_error).
+            CATCH cx_salv_error ##NO_HANDLER.
           ENDTRY.
       ENDTRY.
     ENDIF.
@@ -221,7 +238,7 @@ CLASS zcl_dutils_ci_result_view IMPLEMENTATION.
           RETURN.
 
         ENDIF.
-      CATCH zcx_dutils_exception.
+      CATCH zcx_dutils_exception ##NO_HANDLER.
     ENDTRY.
 
     DATA(test_ref) = cl_ci_tests=>get_test_ref( <result>-test ).
@@ -314,7 +331,7 @@ CLASS zcl_dutils_ci_result_view IMPLEMENTATION.
               ENDIF.
 
           ENDCASE.
-        CATCH cx_root.
+        CATCH cx_root ##NO_HANDLER.
       ENDTRY.
     ENDIF.
 
