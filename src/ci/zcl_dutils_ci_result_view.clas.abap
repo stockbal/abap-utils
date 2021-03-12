@@ -202,13 +202,15 @@ CLASS zcl_dutils_ci_result_view IMPLEMENTATION.
           IF kind_filter IS BOUND.
             DATA(filter_selopt) = kind_filter->get( ).
             IF filter_selopt IS NOT INITIAL.
-              filter_selopt[ 1 ]->set_low( CONV #( kind ) ).
+              ASSIGN filter_selopt[ 1 ] TO FIELD-SYMBOL(<filter>).
+              <filter>->set_low( CONV #( kind ) ).
             ENDIF.
           ENDIF.
         CATCH cx_salv_not_found.
           TRY.
-              filters->add_filter( columnname = c_fields-kind
-                                   low        = CONV #( kind ) ).
+              filters->add_filter(
+                columnname = c_fields-kind
+                low        = CONV #( kind ) ).
             CATCH cx_salv_error ##NO_HANDLER.
           ENDTRY.
       ENDTRY.

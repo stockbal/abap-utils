@@ -66,17 +66,6 @@ CLASS zcl_dutils_code_inspector IMPLEMENTATION.
       RAISE EXCEPTION TYPE zcx_dutils_exception
         EXPORTING
           text = |No valid check variant { check_variant_name  }|.
-    ELSE. " validate if check variant can be used
-      check_variant->verify(
-        EXPORTING p_srcid    = VALUE #( )
-        IMPORTING p_messages = DATA(verifition_msgs) ).
-
-      ASSIGN verifition_msgs[ kind = 'E' ] TO FIELD-SYMBOL(<error_msg>).
-      IF sy-subrc = 0.
-        RAISE EXCEPTION TYPE zcx_dutils_exception
-          EXPORTING
-            text = CONV #( <error_msg>-text ).
-      ENDIF.
     ENDIF.
 
   ENDMETHOD.

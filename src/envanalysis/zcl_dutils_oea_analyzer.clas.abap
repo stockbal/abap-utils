@@ -99,9 +99,9 @@ CLASS zcl_dutils_oea_analyzer IMPLEMENTATION.
   METHOD fill_analysis_info.
     GET TIME STAMP FIELD DATA(valid_to).
 
-    valid_to = cl_abap_timestamp_util=>get_instance( )->tstmp_add_seconds(
-      iv_timestamp = valid_to
-      iv_seconds   = c_two_hour_validity ).
+    valid_to = cl_abap_tstmp=>add(
+      tstmp = valid_to
+      secs  = c_two_hour_validity ).
 
     me->analysis_info = VALUE zif_dutils_ty_oea=>ty_analysis_info_db(
       BASE me->analysis_info
@@ -202,9 +202,9 @@ CLASS zcl_dutils_oea_analyzer IMPLEMENTATION.
 
     GET TIME STAMP FIELD DATA(end_time).
 
-    me->analysis_info-duration = cl_abap_timestamp_util=>get_instance( )->tstmp_seconds_between(
-      iv_timestamp0 = start_time
-      iv_timestamp1 = end_time ).
+    me->analysis_info-duration = cl_abap_tstmp=>subtract(
+      tstmp1 = end_time
+      tstmp2 = start_time ).
 
     me->obj_env_dac->insert_analysis_info( me->analysis_info ).
 

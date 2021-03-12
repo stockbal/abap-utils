@@ -378,10 +378,7 @@ CLASS zcl_dutils_ci_run IMPLEMENTATION.
 
   METHOD run_inspection.
 
-    DATA: start_time TYPE timestampl,
-          end_time   TYPE timestampl.
-
-    GET TIME STAMP FIELD start_time.
+    GET TIME STAMP FIELD DATA(start_time).
 
     me->inspection->run(
       EXPORTING
@@ -396,11 +393,11 @@ CLASS zcl_dutils_ci_run IMPLEMENTATION.
           text = |Code inspector run failed. Subrc = { sy-subrc }|.
     ENDIF.
 
-    GET TIME STAMP FIELD end_time.
+    GET TIME STAMP FIELD DATA(end_time).
 
-    insp_duration = cl_abap_timestamp_util=>get_instance( )->tstmpl_seconds_between(
-      iv_timestamp0 = start_time
-      iv_timestamp1 = end_time ).
+    me->insp_duration = cl_abap_tstmp=>subtract(
+      tstmp1 = end_time
+      tstmp2 = start_time ).
 
     me->inspection->plain_list( IMPORTING p_list = me->plain_results ).
 
