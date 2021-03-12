@@ -161,7 +161,7 @@ CLASS zcl_dutils_ci_result_view IMPLEMENTATION.
     DATA(sorts) = ci_result_alv->get_sorts( ).
     TRY.
         sorts->add_sort(
-          columnname = c_fields-kind
+          columnname = c_fields-kind_icon
           position   = 1
           sequence   = if_salv_c_sort=>sort_up ).
         sorts->add_sort(
@@ -295,7 +295,7 @@ CLASS zcl_dutils_ci_result_view IMPLEMENTATION.
       WHEN 'W'.
         result-kind_icon = |@{ icon_led_yellow+1(2) }\\QWarning@|.
       WHEN OTHERS.
-        result-kind_icon = |@{ icon_led_green+1(2) }\\QInfo@|.
+        result-kind_icon = |@{ icon_led_inactive+1(2) }\\QInfo@|.
     ENDCASE.
 
     IF result-objtype = 'CLAS' OR
