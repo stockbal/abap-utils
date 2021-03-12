@@ -37,13 +37,13 @@ ENDCLASS.
 CLASS zcl_dutils_tadir_reader IMPLEMENTATION.
 
   METHOD constructor.
-    me->package_reader = zcl_dutils_reader_factory=>get_package_reader( ).
+    package_reader = zcl_dutils_reader_factory=>get_package_reader( ).
   ENDMETHOD.
 
   METHOD zif_dutils_tadir_reader~include_by_name.
     CHECK names IS NOT INITIAL.
 
-    me->where_ranges-name = VALUE #(
+    where_ranges-name = VALUE #(
       FOR <name> IN names
       ( sign   = 'I'
         option = COND #( WHEN <name> CA '+*' THEN 'CP' ELSE 'EQ' )
@@ -55,19 +55,19 @@ CLASS zcl_dutils_tadir_reader IMPLEMENTATION.
   METHOD zif_dutils_tadir_reader~include_by_package.
     CHECK packages IS NOT INITIAL.
 
-    me->where_ranges-package = VALUE #(
+    where_ranges-package = VALUE #(
       FOR <pack> IN packages
       ( sign   = 'I'
         option = COND #( WHEN <pack> CA '+*' THEN 'CP' ELSE 'EQ' )
         low    = to_upper( <pack> ) ) ).
 
     IF resolve_subpackages = abap_true.
-      me->where_ranges-package = VALUE #(
-        BASE me->where_ranges-package
-        ( LINES OF me->package_reader->get_subpackages_by_range( me->where_ranges-package ) ) ).
+      where_ranges-package = VALUE #(
+        BASE where_ranges-package
+        ( LINES OF package_reader->get_subpackages_by_range( where_ranges-package ) ) ).
 
-      SORT me->where_ranges-package BY sign option low.
-      DELETE ADJACENT DUPLICATES FROM me->where_ranges-package COMPARING sign option low.
+      SORT where_ranges-package BY sign option low.
+      DELETE ADJACENT DUPLICATES FROM where_ranges-package COMPARING sign option low.
     ENDIF.
 
     result = me.
@@ -76,7 +76,7 @@ CLASS zcl_dutils_tadir_reader IMPLEMENTATION.
   METHOD zif_dutils_tadir_reader~include_by_type.
     CHECK types IS NOT INITIAL.
 
-    me->where_ranges-type = VALUE #(
+    where_ranges-type = VALUE #(
       FOR <type> IN types
       ( sign   = 'I'
         option = COND #( WHEN <type> CA '+*' THEN 'CP' ELSE 'EQ' )
@@ -88,7 +88,7 @@ CLASS zcl_dutils_tadir_reader IMPLEMENTATION.
   METHOD zif_dutils_tadir_reader~include_by_author.
     CHECK authors IS NOT INITIAL.
 
-    me->where_ranges-author = VALUE #(
+    where_ranges-author = VALUE #(
       FOR <author> IN authors
       ( sign   = 'I'
         option = COND #( WHEN <author> CA '+*' THEN 'CP' ELSE 'EQ' )
@@ -100,7 +100,7 @@ CLASS zcl_dutils_tadir_reader IMPLEMENTATION.
   METHOD zif_dutils_tadir_reader~select.
     build_where( ).
 
-    IF me->where_clause IS INITIAL.
+    IF where_clause IS INITIAL.
       RETURN.
     ENDIF.
 
@@ -108,7 +108,7 @@ CLASS zcl_dutils_tadir_reader IMPLEMENTATION.
            obj_name AS name,
            devclass AS package
       FROM tadir
-      WHERE (me->where_clause)
+      WHERE (where_clause)
         AND delflag = @abap_false
       ORDER BY type, name
       INTO CORRESPONDING FIELDS OF TABLE @result.
@@ -117,7 +117,7 @@ CLASS zcl_dutils_tadir_reader IMPLEMENTATION.
   METHOD zif_dutils_tadir_reader~select_single.
     build_where( ).
 
-    IF me->where_clause IS INITIAL.
+    IF where_clause IS INITIAL.
       RETURN.
     ENDIF.
 
@@ -125,14 +125,14 @@ CLASS zcl_dutils_tadir_reader IMPLEMENTATION.
                   obj_name AS name,
                   devclass AS package
       FROM tadir
-      WHERE (me->where_clause)
+      WHERE (where_clause)
         AND delflag = @abap_false
       INTO CORRESPONDING FIELDS OF @result.
   ENDMETHOD.
 
   METHOD zif_dutils_tadir_reader~reset.
-    CLEAR: me->where_clause,
-           me->where_ranges.
+    CLEAR: where_clause,
+           where_ranges.
 
     result = me.
   ENDMETHOD.
@@ -155,18 +155,18 @@ CLASS zcl_dutils_tadir_reader IMPLEMENTATION.
   METHOD add_to_where.
     DATA: where_clause_line TYPE string.
 
-    ASSIGN me->(range_name) TO FIELD-SYMBOL(<range_table>).
+    ASSIGN (range_name) TO FIELD-SYMBOL(<range_table>).
     IF sy-subrc <> 0 OR <range_table> IS INITIAL.
       RETURN.
     ENDIF.
 
-    IF me->where_clause IS NOT INITIAL.
+    IF where_clause IS NOT INITIAL.
       where_clause_line = | AND |.
     ENDIF.
 
-    where_clause_line = |{ where_clause_line }{ table_field } IN @me->{ range_name }|.
+    where_clause_line = |{ where_clause_line }{ table_field } IN @{ range_name }|.
 
-    me->where_clause = VALUE #( BASE me->where_clause ( where_clause_line ) ).
+    where_clause = VALUE #( BASE where_clause ( where_clause_line ) ).
   ENDMETHOD.
 
 ENDCLASS.

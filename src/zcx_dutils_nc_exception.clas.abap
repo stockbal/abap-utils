@@ -38,7 +38,7 @@ CLASS zcx_dutils_nc_exception IMPLEMENTATION.
       EXPORTING
         previous = previous.
 
-    CLEAR me->textid.
+    CLEAR textid.
 
     IF text IS NOT INITIAL.
       fill_t100key = abap_true.
@@ -48,11 +48,11 @@ CLASS zcx_dutils_nc_exception IMPLEMENTATION.
     ENDIF.
 
     IF fill_t100key = abap_true.
-      me->msgv1 = sy-msgv1.
-      me->msgv2 = sy-msgv2.
-      me->msgv3 = sy-msgv3.
-      me->msgv4 = sy-msgv4.
-      me->if_t100_message~t100key = VALUE #(
+      msgv1 = sy-msgv1.
+      msgv2 = sy-msgv2.
+      msgv3 = sy-msgv3.
+      msgv4 = sy-msgv4.
+      if_t100_message~t100key = VALUE #(
         msgid = sy-msgid
         msgno = sy-msgno
         attr1 = 'MSGV1'
@@ -60,9 +60,9 @@ CLASS zcx_dutils_nc_exception IMPLEMENTATION.
         attr3 = 'MSGV3'
         attr4 = 'MSGV4' ).
     ELSE.
-      me->if_t100_message~t100key = if_t100_message=>default_textid.
+      if_t100_message~t100key = if_t100_message=>default_textid.
     ENDIF.
 
-    me->previous = previous.
+    previous = previous.
   ENDMETHOD.
 ENDCLASS.
