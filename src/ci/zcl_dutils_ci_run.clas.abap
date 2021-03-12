@@ -360,7 +360,7 @@ CLASS zcl_dutils_ci_run IMPLEMENTATION.
     ENDIF.
 
     " if no objects have been determined no inspection is possible
-    IF lines( result->iobjlst-objects ) = 0.
+    IF result IS INITIAL OR lines( result->iobjlst-objects ) = 0.
       cleanup( result ).
       RAISE EXCEPTION TYPE zcx_dutils_exception
         EXPORTING
