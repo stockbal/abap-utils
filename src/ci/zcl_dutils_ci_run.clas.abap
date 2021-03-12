@@ -180,14 +180,14 @@ CLASS zcl_dutils_ci_run IMPLEMENTATION.
 
     cl_ci_checkvariant=>get_ref(
       EXPORTING
-        p_user                   = ''
-        p_name                   = variant_name
+        p_user            = ''
+        p_name            = variant_name
       RECEIVING
-        p_ref                    = result
+        p_ref             = result
       EXCEPTIONS
-        chkv_not_exists          = 1
-        missing_parameter        = 2
-        OTHERS                   = 3 ).
+        chkv_not_exists   = 1
+        missing_parameter = 2
+        OTHERS            = 3 ).
 
     CASE sy-subrc.
       WHEN 1.
@@ -211,7 +211,7 @@ CLASS zcl_dutils_ci_run IMPLEMENTATION.
         SELECT SINGLE subc
           FROM trdir
           WHERE name = @obj_info-objname
-        INTO @DATA(program_type).
+          INTO @DATA(program_type).
 
         result = xsdbool( program_type = 'I' ). " Include program.
 
@@ -266,15 +266,14 @@ CLASS zcl_dutils_ci_run IMPLEMENTATION.
     DATA: obj_infos TYPE scit_objs.
 
     IF me->object_assignments-package_range IS NOT INITIAL AND
-       me->resolve_sub_packages = abap_true.
+        me->resolve_sub_packages = abap_true.
 
       DATA(packages) = me->package_reader->resolve_packages( me->object_assignments-package_range ).
       DATA(sub_packages) = me->package_reader->get_subpackages_by_range( packages ).
 
       me->object_assignments-package_range = VALUE #(
         ( LINES OF packages )
-        ( LINES OF sub_packages )
-      ).
+        ( LINES OF sub_packages ) ).
     ENDIF.
 
     IF me->object_assignments IS NOT INITIAL AND me->object_set_ranges IS INITIAL.
@@ -288,8 +287,7 @@ CLASS zcl_dutils_ci_run IMPLEMENTATION.
           p_soresp      = me->object_assignments-responsible_range
         IMPORTING
           p_result_devc = DATA(final_package_range)
-          p_ok          = DATA(packages_ok)
-      ).
+          p_ok          = DATA(packages_ok) ).
 
       IF packages_ok = abap_true.
 
@@ -300,8 +298,8 @@ CLASS zcl_dutils_ci_run IMPLEMENTATION.
           AND delflag = @abap_false
           AND srcsystem IN @object_assignments-source_system_range
           AND author IN @object_assignments-responsible_range
-          AND pgmid = 'R3TR' ##TOO_MANY_ITAB_FIELDS     "#EC CI_GENBUFF
-        INTO CORRESPONDING FIELDS OF TABLE @obj_infos.
+          AND pgmid = 'R3TR'
+          INTO CORRESPONDING FIELDS OF TABLE @obj_infos ##TOO_MANY_ITAB_FIELDS. "#EC CI_GENBUFF
 
         cl_ci_objectset=>save_from_list(
           EXPORTING
@@ -314,8 +312,7 @@ CLASS zcl_dutils_ci_run IMPLEMENTATION.
             locked              = 2
             error_in_enqueue    = 3
             not_authorized      = 4
-            OTHERS              = 5
-        ).
+            OTHERS              = 5 ).
         IF sy-subrc <> 0.
           RAISE EXCEPTION TYPE zcx_dutils_exception
             EXPORTING
@@ -325,8 +322,7 @@ CLASS zcl_dutils_ci_run IMPLEMENTATION.
     ELSEIF me->object_set_ranges IS NOT INITIAL.
       result = cl_ci_objectset=>create(
         p_user = sy-uname
-        p_name = me->inspection_name
-      ).
+        p_name = me->inspection_name ).
       result->save_objectset(
         EXPORTING
           p_tadir               = VALUE #(
@@ -334,8 +330,7 @@ CLASS zcl_dutils_ci_run IMPLEMENTATION.
             socomp = me->object_assignments-software_comp_range
             sodevc = me->object_assignments-package_range
             soosys = me->object_assignments-source_system_range
-            soresp = me->object_assignments-responsible_range
-          )
+            soresp = me->object_assignments-responsible_range )
           p_fugrs               = VALUE #( soname = me->object_set_ranges-func_group_range )
           p_class               = VALUE #( soname = me->object_set_ranges-class_range )
           p_repos               = VALUE #( soname = me->object_set_ranges-report_name_range )
@@ -348,15 +343,13 @@ CLASS zcl_dutils_ci_run IMPLEMENTATION.
             fugrs = xsdbool( me->object_set_ranges-func_group_range IS NOT INITIAL )
             repos = xsdbool( me->object_set_ranges-report_name_range IS NOT INITIAL )
             typps = xsdbool( me->object_set_ranges-type_group_range IS NOT INITIAL )
-            wdyns = xsdbool( me->object_set_ranges-wdyn_comp_name_range IS NOT INITIAL )
-          )
+            wdyns = xsdbool( me->object_set_ranges-wdyn_comp_name_range IS NOT INITIAL ) )
         EXCEPTIONS
           no_valid_selection    = 1
           missing_program_param = 2
           not_enqueued          = 3
           not_authorized        = 4
-          OTHERS                = 5
-      ).
+          OTHERS                = 5 ).
       IF sy-subrc <> 0.
         cleanup( result ).
         RAISE EXCEPTION TYPE zcx_dutils_exception

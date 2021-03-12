@@ -23,7 +23,7 @@ CLASS zcl_dutils_tabl_util IMPLEMENTATION.
       FROM dd02l
       WHERE tabname = @table_name
         AND as4local = 'A'
-    INTO @DATA(table_class).
+      INTO @DATA(table_class).
 
     IF sy-subrc = 0.
       IF table_class = 'INTTAB' OR table_class = 'APPEND'.

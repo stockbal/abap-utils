@@ -58,22 +58,19 @@ START-OF-SELECTION.
         variant_name          = p_civar
         resolve_sub_packages  = p_subp
         object_assignment     = VALUE #(
-           package_range         = s_pack[]
-           appl_comp_range       = s_appco[]
-           software_comp_range   = s_socomp[]
-           transport_layer_range = s_dellay[]
-           responsible_range     = s_respon[]
-           source_system_range   = s_srcsys[]
-        )
+          package_range         = s_pack[]
+          appl_comp_range       = s_appco[]
+          software_comp_range   = s_socomp[]
+          transport_layer_range = s_dellay[]
+          responsible_range     = s_respon[]
+          source_system_range   = s_srcsys[] )
         object_set            = VALUE #(
-           class_range          = s_clas[]
-           func_group_range     = s_fugr[]
-           report_name_range    = s_repo[]
-           wdyn_comp_name_range = s_wdyn[]
-           ddic_type_range      = s_ddic[]
-           type_group_range     = s_ddty[]
-        )
-      ).
+          class_range          = s_clas[]
+          func_group_range     = s_fugr[]
+          report_name_range    = s_repo[]
+          wdyn_comp_name_range = s_wdyn[]
+          ddic_type_range      = s_ddic[]
+          type_group_range     = s_ddty[] ) ).
       ci_run->run( ).
 
       IF ci_run->is_successful( ).

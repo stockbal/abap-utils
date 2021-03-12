@@ -27,7 +27,7 @@ CLASS zcl_dutils_devc_reader IMPLEMENTATION.
     SELECT devclass AS name
       FROM tdevc
       WHERE devclass IN @package_range
-    INTO TABLE @DATA(package_names).
+      INTO TABLE @DATA(package_names).
 
     result = VALUE #(
       FOR package IN package_names
@@ -37,7 +37,7 @@ CLASS zcl_dutils_devc_reader IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD zif_dutils_devc_reader~get_subpackages_by_range.
-    result = list_sub_packages( package_range  ).
+    result = list_sub_packages( package_range ).
   ENDMETHOD.
 
   METHOD zif_dutils_devc_reader~get_subpackages.
@@ -52,7 +52,7 @@ CLASS zcl_dutils_devc_reader IMPLEMENTATION.
     SELECT devclass
       FROM tdevc
       WHERE parentcl IN @package_range
-    INTO TABLE @package_names.
+      INTO TABLE @package_names.
 
     result = VALUE #(
       FOR package_name IN package_names
@@ -65,7 +65,7 @@ CLASS zcl_dutils_devc_reader IMPLEMENTATION.
         FROM tdevc
         FOR ALL ENTRIES IN @package_names
         WHERE parentcl = @package_names-table_line
-      INTO TABLE @package_names.
+        INTO TABLE @package_names.
 
       result = VALUE #( BASE result
         FOR package_name IN package_names

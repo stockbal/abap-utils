@@ -126,25 +126,23 @@ CLASS zcl_dutils_adt_obj_util IMPLEMENTATION.
         adt_uri_mapper = DATA(adt_uri_mapper)
         adt_objectref  = DATA(adt_objref)
         program        = DATA(program)
-        include        = DATA(include)
-    ).
+        include        = DATA(include) ).
 
     TRY.
         IF sub_object_name IS NOT INITIAL.
 
           IF ( program <> object_name AND include IS INITIAL ) OR
-             ( program = include AND sub_object_name IS NOT INITIAL ).
+              ( program = include AND sub_object_name IS NOT INITIAL ).
             include = sub_object_name.
           ENDIF.
 
           DATA(adt_sub_objref) = adt_uri_mapper->map_include_to_objref(
-              program            = program
-              include            = include
-              line               = line_number
-              line_offset        = 0
-              end_line           = line_number
-              end_offset         = 1
-          ).
+            program      = program
+            include      = include
+            line         = line_number
+            line_offset  = 0
+            end_line     = line_number
+            end_offset   = 1 ).
 
           IF adt_sub_objref IS NOT INITIAL.
             adt_objref = adt_sub_objref.
@@ -154,8 +152,9 @@ CLASS zcl_dutils_adt_obj_util IMPLEMENTATION.
 
         DATA(adt_link) = |adt://{ sy-sysid }{ adt_objref->ref_data-uri }|.
 
-        cl_gui_frontend_services=>execute( EXPORTING  document = adt_link
-                                           EXCEPTIONS OTHERS   = 1 ).
+        cl_gui_frontend_services=>execute(
+          EXPORTING  document = adt_link
+          EXCEPTIONS OTHERS   = 1 ).
 
         IF sy-subrc <> 0.
           RAISE EXCEPTION TYPE zcx_dutils_exception
@@ -220,17 +219,15 @@ CLASS zcl_dutils_adt_obj_util IMPLEMENTATION.
         mapping_options->set_use_parent( abap_true ).
       ENDIF.
       adt_objectref = adt_uri_mapper->map_wb_request_to_objref(
-          wb_request      = wb_request
-          mapping_options = mapping_options
-      ).
+        wb_request      = wb_request
+        mapping_options = mapping_options ).
       IF program IS SUPPLIED.
         adt_uri_mapper->map_objref_to_include(
           EXPORTING
-            uri                = adt_objectref->ref_data-uri
+            uri     = adt_objectref->ref_data-uri
           IMPORTING
-            program            = program
-            include            = include
-        ).
+            program = program
+            include = include ).
       ENDIF.
     ENDIF.
   ENDMETHOD.
@@ -243,10 +240,9 @@ CLASS zcl_dutils_adt_obj_util IMPLEMENTATION.
 
     IF <adt_obj_info> IS NOT ASSIGNED OR ignore_cache = abap_true.
       DATA(object_info) = map_tadir_obj_to_object_ref(
-         name            = name
-         wb_type            = wb_type
-         retrieve_parent = retrieve_parent
-      ).
+        name            = name
+        wb_type         = wb_type
+        retrieve_parent = retrieve_parent ).
       IF object_info IS NOT INITIAL AND object_info-uri IS NOT INITIAL.
         adt_obj_info = object_info.
 
@@ -254,8 +250,7 @@ CLASS zcl_dutils_adt_obj_util IMPLEMENTATION.
           INSERT VALUE #(
             name       = name
             type       = wb_type
-            adt_object = object_info
-          ) INTO TABLE adt_obj_infos.
+            adt_object = object_info ) INTO TABLE adt_obj_infos.
         ENDIF.
 
       ENDIF.
@@ -276,13 +271,12 @@ CLASS zcl_dutils_adt_obj_util IMPLEMENTATION.
       TRY.
           get_adt_objects_and_names(
             EXPORTING
-              object_name        = name
-              object_type        = tadir_type
+              object_name     = name
+              object_type     = tadir_type
               retrieve_parent = retrieve_parent
             IMPORTING
-              adt_objectref  = DATA(adt_objectref)
-              adt_uri_mapper = DATA(uri_mapper)
-          ).
+              adt_objectref   = DATA(adt_objectref)
+              adt_uri_mapper  = DATA(uri_mapper) ).
           IF adt_objectref->ref_data-uri IS INITIAL.
             RETURN.
           ENDIF.
@@ -298,8 +292,7 @@ CLASS zcl_dutils_adt_obj_util IMPLEMENTATION.
         INSERT VALUE #(
           name       = name
           type       = tadir_type
-          adt_object = adt_obj_info
-        ) INTO TABLE adt_obj_infos.
+          adt_object = adt_obj_info ) INTO TABLE adt_obj_infos.
       ENDIF.
     ELSE.
       adt_obj_info = <adt_object_info>-adt_object.
@@ -319,8 +312,7 @@ CLASS zcl_dutils_adt_obj_util IMPLEMENTATION.
           EXCEPTIONS
             objecttype_not_existing   = 1
             input_data_not_sufficient = 2
-            OTHERS                    = 3
-        ).
+            OTHERS                    = 3 ).
         CHECK sy-subrc = 0.
         DATA(adt_tools_core_f) = cl_adt_tools_core_factory=>get_instance( ).
         DATA(uri_mapper) = adt_tools_core_f->get_uri_mapper( ).
@@ -331,18 +323,15 @@ CLASS zcl_dutils_adt_obj_util IMPLEMENTATION.
         ENDIF.
 
         DATA(adt_obj_ref) = uri_mapper->map_wb_object_to_objref(
-            wb_object       = wb_object
-            mapping_options = mapping_options
-        ).
+          wb_object       = wb_object
+          mapping_options = mapping_options ).
         CHECK adt_obj_ref IS BOUND.
         adt_obj_info = CORRESPONDING #( adt_obj_ref->ref_data ).
 
         adjust_object_reference( CHANGING adt_obj_info = adt_obj_info ).
 
         IF adt_obj_info-parent_uri IS NOT INITIAL.
-          resolve_parent_uri(
-            CHANGING adt_obj_info = adt_obj_info
-          ).
+          resolve_parent_uri( CHANGING adt_obj_info = adt_obj_info ).
         ENDIF.
 
       CATCH cx_adt_uri_mapping.
@@ -366,15 +355,14 @@ CLASS zcl_dutils_adt_obj_util IMPLEMENTATION.
         IN uri IGNORING CASE SUBMATCHES object_name.
       object_name = cl_http_utility=>unescape_url( object_name ).
       object_type-objtype_tr =
-      tadir_type = c_adt_types-segw_project.
+       tadir_type = c_adt_types-segw_project.
       RETURN.
     ENDIF.
 
     DATA(adt_tools_core_f) = cl_adt_tools_core_factory=>get_instance( ).
 
     DATA(wb_object) = adt_tools_core_f->get_uri_mapper( )->map_objref_to_wb_object(
-        uri = uri
-    ).
+      uri = uri ).
     object_name = wb_object->get_display_name( ).
     wb_object->get_global_wb_key( IMPORTING p_object_type = object_type ).
     wb_object->get_object_type_ref( )->get_tadir_types( IMPORTING p_r3tr_object_type = tadir_type ).
@@ -400,22 +388,20 @@ CLASS zcl_dutils_adt_obj_util IMPLEMENTATION.
         uri         = adt_obj_info-parent_uri
       IMPORTING
         object_name = DATA(parent_name)
-        object_type = DATA(parent_type)
-    ).
+        object_type = DATA(parent_type) ).
     adt_obj_info-parent_name = parent_name.
     IF adt_obj_info-parent_name CP 'SAPL*'.
       adt_obj_info-parent_name = adt_obj_info-parent_name+4.
     ENDIF.
     adt_obj_info-parent_type = COND #(
       WHEN parent_type-subtype_wb IS NOT INITIAL THEN |{ parent_type-objtype_tr }/{ parent_type-subtype_wb }|
-      ELSE                                               parent_type-objtype_tr
-    ).
+      ELSE                                            parent_type-objtype_tr ).
   ENDMETHOD.
 
 
   METHOD adjust_object_reference.
     IF adt_obj_info-type CP 'FUGR*' AND
-       adt_obj_info-name CP 'SAPL*'.
+        adt_obj_info-name CP 'SAPL*'.
 
       adt_obj_info-name = adt_obj_info-name+4.
       CLEAR adt_obj_info-parent_uri.

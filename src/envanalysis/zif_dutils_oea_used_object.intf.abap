@@ -10,7 +10,7 @@ INTERFACE zif_dutils_oea_used_object
     get_display_name FOR zif_dutils_oea_object~get_display_name.
 
   TYPES:
-    ty_table TYPE STANDARD TABLE OF REF TO zif_dutils_oea_used_object WITH DEFAULT KEY.
+    ty_table TYPE STANDARD TABLE OF REF TO zif_dutils_oea_used_object WITH EMPTY KEY.
 
   METHODS:
     "! <p class="shorttext synchronized" lang="en">Converts object to structure</p>

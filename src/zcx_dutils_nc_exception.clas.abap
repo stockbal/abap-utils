@@ -58,8 +58,7 @@ CLASS zcx_dutils_nc_exception IMPLEMENTATION.
         attr1 = 'MSGV1'
         attr2 = 'MSGV2'
         attr3 = 'MSGV3'
-        attr4 = 'MSGV4'
-      ).
+        attr4 = 'MSGV4' ).
     ELSE.
       me->if_t100_message~t100key = if_t100_message=>default_textid.
     ENDIF.

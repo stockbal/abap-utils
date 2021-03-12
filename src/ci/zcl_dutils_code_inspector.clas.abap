@@ -55,8 +55,6 @@ CLASS zcl_dutils_code_inspector IMPLEMENTATION.
       EXPORTING
         p_user            = space
         p_name            = check_variant_name
-      RECEIVING
-        p_ref             = DATA(check_variant)
       EXCEPTIONS
         chkv_not_exists   = 1
         missing_parameter = 2

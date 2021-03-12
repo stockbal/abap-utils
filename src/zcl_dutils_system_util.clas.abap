@@ -31,7 +31,6 @@ CLASS zcl_dutils_system_util IMPLEMENTATION.
             EXPORTING
               text = uuid_error->get_text( ).
         ENDIF.
-
     ENDTRY.
   ENDMETHOD.
 

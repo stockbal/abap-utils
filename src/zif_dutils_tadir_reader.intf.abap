@@ -3,10 +3,10 @@ INTERFACE zif_dutils_tadir_reader
   PUBLIC .
 
   TYPES:
-    ty_names    TYPE STANDARD TABLE OF tadir-obj_name WITH DEFAULT KEY,
-    ty_types    TYPE STANDARD TABLE OF tadir-object WITH DEFAULT KEY,
-    ty_packages TYPE STANDARD TABLE OF tadir-devclass WITH DEFAULT KEY,
-    ty_authors  TYPE STANDARD TABLE OF tadir-author WITH DEFAULT KEY.
+    ty_names    TYPE STANDARD TABLE OF tadir-obj_name WITH EMPTY KEY,
+    ty_types    TYPE STANDARD TABLE OF tadir-object WITH EMPTY KEY,
+    ty_packages TYPE STANDARD TABLE OF tadir-devclass WITH EMPTY KEY,
+    ty_authors  TYPE STANDARD TABLE OF tadir-author WITH EMPTY KEY.
 
   METHODS:
     "! <p class="shorttext synchronized" lang="en">Include given types in the select</p>

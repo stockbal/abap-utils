@@ -88,7 +88,7 @@ CLASS zcl_dutils_oea_iwpr_env_srv IMPLEMENTATION.
       EXPORTING  p_name         = mpc_name
       RECEIVING  p_descr_ref    = DATA(type_descr)
       EXCEPTIONS type_not_found = 1 ).
-    IF sy-subrc <> 0 or type_descr->kind <> cl_abap_typedescr=>kind_class.
+    IF sy-subrc <> 0 OR type_descr->kind <> cl_abap_typedescr=>kind_class.
       RETURN.
     ENDIF.
 

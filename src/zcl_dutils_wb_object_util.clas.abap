@@ -83,7 +83,7 @@ CLASS zcl_dutils_wb_object_util IMPLEMENTATION.
       wb_object-display_name = function_info-name.
     ELSE.
       wb_object-sub_type = swbm_c_type_prg_include.
-      wb_object-name =
+      wb_object-name = include_name.
       wb_object-display_name = include_name.
     ENDIF.
   ENDMETHOD.

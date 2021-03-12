@@ -151,10 +151,10 @@ CLASS zcl_dutils_oea_analyzer IMPLEMENTATION.
 
   METHOD derive_src_objects.
     DATA(derived_objects) = me->repo_reader->reset(
-    )->include_by_package(
-      packages            = VALUE #( ( source_object->get_display_name( ) ) )
-      resolve_subpackages = abap_true
-    )->select( ).
+      )->include_by_package(
+        packages            = VALUE #( ( source_object->get_display_name( ) ) )
+        resolve_subpackages = abap_true
+      )->select( ).
 
     LOOP AT derived_objects ASSIGNING FIELD-SYMBOL(<derived_object>).
 

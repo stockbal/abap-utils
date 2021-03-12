@@ -111,7 +111,7 @@ CLASS zcl_dutils_tadir_reader IMPLEMENTATION.
       WHERE (me->where_clause)
         AND delflag = @abap_false
       ORDER BY type, name
-    INTO CORRESPONDING FIELDS OF TABLE @result.
+      INTO CORRESPONDING FIELDS OF TABLE @result.
   ENDMETHOD.
 
   METHOD zif_dutils_tadir_reader~select_single.
@@ -127,7 +127,7 @@ CLASS zcl_dutils_tadir_reader IMPLEMENTATION.
       FROM tadir
       WHERE (me->where_clause)
         AND delflag = @abap_false
-    INTO CORRESPONDING FIELDS OF @result.
+      INTO CORRESPONDING FIELDS OF @result.
   ENDMETHOD.
 
   METHOD zif_dutils_tadir_reader~reset.

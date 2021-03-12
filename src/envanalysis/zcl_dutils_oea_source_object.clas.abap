@@ -58,7 +58,7 @@ CLASS zcl_dutils_oea_source_object IMPLEMENTATION.
       DATA(used_object_data) = used_object->to_data( ).
       used_object_data-analysis_id = analysis_id.
       used_object_data-source_obj_id = me->id.
-      used_objects_db = VALUE #( BASE used_objects_db ( used_object_data  ) ).
+      used_objects_db = VALUE #( BASE used_objects_db ( used_object_data ) ).
     ENDLOOP.
 
     " discard of duplicates
@@ -113,9 +113,9 @@ CLASS zcl_dutils_oea_source_object IMPLEMENTATION.
 
       WHEN OTHERS.
         DATA(repo_result) = zcl_dutils_reader_factory=>create_repo_reader(
-        )->include_by_name( VALUE #( ( me->name ) )
-        )->include_by_type( VALUE #( ( me->external_type ) )
-        )->select_single( ).
+          )->include_by_name( VALUE #( ( me->name ) )
+          )->include_by_type( VALUE #( ( me->external_type ) )
+          )->select_single( ).
         result = xsdbool( repo_result IS NOT INITIAL ).
 
     ENDCASE.

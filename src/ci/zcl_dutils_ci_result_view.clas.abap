@@ -116,8 +116,7 @@ CLASS zcl_dutils_ci_result_view IMPLEMENTATION.
   METHOD create_alv.
     cl_salv_table=>factory(
       IMPORTING r_salv_table = me->ci_result_alv
-      CHANGING  t_table      = me->plain_results
-    ).
+      CHANGING  t_table      = me->plain_results ).
 
     DATA(cols) = me->ci_result_alv->get_columns( ).
 
@@ -155,10 +154,9 @@ CLASS zcl_dutils_ci_result_view IMPLEMENTATION.
 
     DATA(functions) = me->ci_result_alv->get_functions( ).
     me->ci_result_alv->set_screen_status(
-        report        = 'ZDUTILS_CI_RUNNER'
-        pfstatus      = 'CI_RESULTS'
-        set_functions = cl_salv_table=>c_functions_all
-    ).
+      report        = 'ZDUTILS_CI_RUNNER'
+      pfstatus      = 'CI_RESULTS'
+      set_functions = cl_salv_table=>c_functions_all ).
 
     DATA(sorts) = me->ci_result_alv->get_sorts( ).
     TRY.
@@ -301,7 +299,7 @@ CLASS zcl_dutils_ci_result_view IMPLEMENTATION.
     ENDCASE.
 
     IF result-objtype = 'CLAS' OR
-       ( result-objtype = 'PROG' AND NOT result-sobjname+30(*) IS INITIAL ).
+        ( result-objtype = 'PROG' AND result-sobjname+30(*) IS NOT INITIAL ).
       TRY.
           CASE result-sobjname+30(*).
             WHEN seop_incextapp_definition.
