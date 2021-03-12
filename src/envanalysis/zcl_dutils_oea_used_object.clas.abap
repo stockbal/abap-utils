@@ -37,20 +37,20 @@ CLASS zcl_dutils_oea_used_object IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD zif_dutils_oea_object~get_display_name.
-    result = me->display_name.
+    result = display_name.
   ENDMETHOD.
 
   METHOD zif_dutils_oea_object~get_name.
-    result = me->name.
+    result = name.
   ENDMETHOD.
 
   METHOD zif_dutils_oea_used_object~to_data.
     result = VALUE zif_dutils_ty_oea=>ty_used_object_db(
-      used_obj_id           = me->id
-      used_obj_type         = me->type
-      used_obj_sub_type     = me->sub_type
-      used_obj_name         = me->name
-      used_obj_display_name = me->display_name ).
+      used_obj_id           = id
+      used_obj_type         = type
+      used_obj_sub_type     = sub_type
+      used_obj_name         = name
+      used_obj_display_name = display_name ).
   ENDMETHOD.
 
 ENDCLASS.

@@ -70,17 +70,17 @@ ENDCLASS.
 CLASS zcl_dutils_ci_run IMPLEMENTATION.
 
   METHOD constructor.
-    me->package_reader = zcl_dutils_reader_factory=>get_package_reader( ).
-    me->object_set_ranges = object_set.
-    me->object_assignments = object_assignment.
+    package_reader = zcl_dutils_reader_factory=>get_package_reader( ).
+    object_set_ranges = object_set.
+    object_assignments = object_assignment.
     me->variant_name = variant_name.
     me->resolve_sub_packages = resolve_sub_packages.
 
     " the inspection and object set are created with dummy names.
     " Because we want to persist them so we can run it in parallel.
     " Both are deleted afterwards.
-    me->inspection_name = |{ sy-uname }_{ sy-datum }_{ sy-uzeit }|.
-    me->run_mode = COND #(
+    inspection_name = |{ sy-uname }_{ sy-datum }_{ sy-uzeit }|.
+    run_mode = COND #(
       WHEN sy-batch = abap_true THEN zif_dutils_ci_run~c_run_mode-run_in_batch
       ELSE                           zif_dutils_ci_run~c_run_mode-run_loc_parallel ).
   ENDMETHOD.
@@ -105,7 +105,7 @@ CLASS zcl_dutils_ci_run IMPLEMENTATION.
 
 
   METHOD zif_dutils_ci_run~is_successful.
-    result = me->successful.
+    result = successful.
   ENDMETHOD.
 
 
@@ -113,7 +113,7 @@ CLASS zcl_dutils_ci_run IMPLEMENTATION.
 
     TRY.
         DATA(object_set) = create_objectset( ).
-        DATA(check_variant) = create_variant( me->variant_name ).
+        DATA(check_variant) = create_variant( variant_name ).
 
         create_inspection(
           object_set     = object_set
@@ -123,7 +123,7 @@ CLASS zcl_dutils_ci_run IMPLEMENTATION.
 
         cleanup( object_set ).
 
-        successful = xsdbool( me->plain_results IS INITIAL ).
+        successful = xsdbool( plain_results IS INITIAL ).
       CATCH zcx_dutils_exception INTO DATA(error).
         cleanup( object_set ).
         RAISE EXCEPTION error.
@@ -133,9 +133,9 @@ CLASS zcl_dutils_ci_run IMPLEMENTATION.
 
   METHOD cleanup.
 
-    IF me->inspection IS BOUND.
+    IF inspection IS BOUND.
 
-      me->inspection->delete(
+      inspection->delete(
         EXCEPTIONS
           locked              = 1
           error_in_enqueue    = 2
@@ -227,9 +227,9 @@ CLASS zcl_dutils_ci_run IMPLEMENTATION.
     cl_ci_inspection=>create(
       EXPORTING
         p_user           = sy-uname
-        p_name           = me->inspection_name
+        p_name           = inspection_name
       RECEIVING
-        p_ref            = me->inspection
+        p_ref            = inspection
       EXCEPTIONS
         locked           = 1
         error_in_enqueue = 2
@@ -242,11 +242,11 @@ CLASS zcl_dutils_ci_run IMPLEMENTATION.
           text = |Failed to create inspection. Subrc = { sy-subrc }|.
     ENDIF.
 
-    me->inspection->set(
+    inspection->set(
       p_chkv = check_variant
       p_objs = object_set ).
 
-    me->inspection->save(
+    inspection->save(
       EXCEPTIONS
         missing_information = 1
         insp_no_name        = 2
@@ -265,26 +265,26 @@ CLASS zcl_dutils_ci_run IMPLEMENTATION.
   METHOD create_objectset.
     DATA: obj_infos TYPE scit_objs.
 
-    IF me->object_assignments-package_range IS NOT INITIAL AND
-        me->resolve_sub_packages = abap_true.
+    IF object_assignments-package_range IS NOT INITIAL AND
+        resolve_sub_packages = abap_true.
 
-      DATA(packages) = me->package_reader->resolve_packages( me->object_assignments-package_range ).
-      DATA(sub_packages) = me->package_reader->get_subpackages_by_range( packages ).
+      DATA(packages) = package_reader->resolve_packages( object_assignments-package_range ).
+      DATA(sub_packages) = package_reader->get_subpackages_by_range( packages ).
 
-      me->object_assignments-package_range = VALUE #(
+      object_assignments-package_range = VALUE #(
         ( LINES OF packages )
         ( LINES OF sub_packages ) ).
     ENDIF.
 
-    IF me->object_assignments IS NOT INITIAL AND me->object_set_ranges IS INITIAL.
+    IF object_assignments IS NOT INITIAL AND object_set_ranges IS INITIAL.
       cl_ci_objectset=>get_packages_from_akh(
         EXPORTING
-          p_socomp      = me->object_assignments-appl_comp_range
-          p_soappl      = me->object_assignments-software_comp_range
-          p_sopdev      = me->object_assignments-transport_layer_range
-          p_sodevc      = me->object_assignments-package_range
-          p_soosys      = me->object_assignments-source_system_range
-          p_soresp      = me->object_assignments-responsible_range
+          p_socomp      = object_assignments-appl_comp_range
+          p_soappl      = object_assignments-software_comp_range
+          p_sopdev      = object_assignments-transport_layer_range
+          p_sodevc      = object_assignments-package_range
+          p_soosys      = object_assignments-source_system_range
+          p_soresp      = object_assignments-responsible_range
         IMPORTING
           p_result_devc = DATA(final_package_range)
           p_ok          = DATA(packages_ok) ).
@@ -304,7 +304,7 @@ CLASS zcl_dutils_ci_run IMPLEMENTATION.
         cl_ci_objectset=>save_from_list(
           EXPORTING
             p_objects           = obj_infos
-            p_name              = me->inspection_name
+            p_name              = inspection_name
           RECEIVING
             p_ref               = result
           EXCEPTIONS
@@ -319,31 +319,31 @@ CLASS zcl_dutils_ci_run IMPLEMENTATION.
               text = |Object Set Creation failed. Subrc = { sy-subrc }|.
         ENDIF.
       ENDIF.
-    ELSEIF me->object_set_ranges IS NOT INITIAL.
+    ELSEIF object_set_ranges IS NOT INITIAL.
       result = cl_ci_objectset=>create(
         p_user = sy-uname
-        p_name = me->inspection_name ).
+        p_name = inspection_name ).
       result->save_objectset(
         EXPORTING
           p_tadir               = VALUE #(
-            soappl = me->object_assignments-appl_comp_range
-            socomp = me->object_assignments-software_comp_range
-            sodevc = me->object_assignments-package_range
-            soosys = me->object_assignments-source_system_range
-            soresp = me->object_assignments-responsible_range )
-          p_fugrs               = VALUE #( soname = me->object_set_ranges-func_group_range )
-          p_class               = VALUE #( soname = me->object_set_ranges-class_range )
-          p_repos               = VALUE #( soname = me->object_set_ranges-report_name_range )
-          p_ddics               = VALUE #( soname = me->object_set_ranges-ddic_type_range )
-          p_typps               = VALUE #( soname = me->object_set_ranges-type_group_range )
-          p_wdyns               = VALUE #( soname = me->object_set_ranges-wdyn_comp_name_range )
+            soappl = object_assignments-appl_comp_range
+            socomp = object_assignments-software_comp_range
+            sodevc = object_assignments-package_range
+            soosys = object_assignments-source_system_range
+            soresp = object_assignments-responsible_range )
+          p_fugrs               = VALUE #( soname = object_set_ranges-func_group_range )
+          p_class               = VALUE #( soname = object_set_ranges-class_range )
+          p_repos               = VALUE #( soname = object_set_ranges-report_name_range )
+          p_ddics               = VALUE #( soname = object_set_ranges-ddic_type_range )
+          p_typps               = VALUE #( soname = object_set_ranges-type_group_range )
+          p_wdyns               = VALUE #( soname = object_set_ranges-wdyn_comp_name_range )
           p_sel_flags           = VALUE #(
-            class = xsdbool( me->object_set_ranges-class_range IS NOT INITIAL )
-            ddics = xsdbool( me->object_set_ranges-ddic_type_range IS NOT INITIAL )
-            fugrs = xsdbool( me->object_set_ranges-func_group_range IS NOT INITIAL )
-            repos = xsdbool( me->object_set_ranges-report_name_range IS NOT INITIAL )
-            typps = xsdbool( me->object_set_ranges-type_group_range IS NOT INITIAL )
-            wdyns = xsdbool( me->object_set_ranges-wdyn_comp_name_range IS NOT INITIAL ) )
+            class = xsdbool( object_set_ranges-class_range IS NOT INITIAL )
+            ddics = xsdbool( object_set_ranges-ddic_type_range IS NOT INITIAL )
+            fugrs = xsdbool( object_set_ranges-func_group_range IS NOT INITIAL )
+            repos = xsdbool( object_set_ranges-report_name_range IS NOT INITIAL )
+            typps = xsdbool( object_set_ranges-type_group_range IS NOT INITIAL )
+            wdyns = xsdbool( object_set_ranges-wdyn_comp_name_range IS NOT INITIAL ) )
         EXCEPTIONS
           no_valid_selection    = 1
           missing_program_param = 2
@@ -373,9 +373,9 @@ CLASS zcl_dutils_ci_run IMPLEMENTATION.
 
     GET TIME STAMP FIELD DATA(start_time).
 
-    me->inspection->run(
+    inspection->run(
       EXPORTING
-        p_howtorun            = me->run_mode
+        p_howtorun            = run_mode
       EXCEPTIONS
         invalid_check_version = 1
         OTHERS                = 2 ).
@@ -388,15 +388,15 @@ CLASS zcl_dutils_ci_run IMPLEMENTATION.
 
     GET TIME STAMP FIELD DATA(end_time).
 
-    me->insp_duration = cl_abap_tstmp=>subtract(
+    insp_duration = cl_abap_tstmp=>subtract(
       tstmp1 = end_time
       tstmp2 = start_time ).
 
-    me->inspection->plain_list( IMPORTING p_list = me->plain_results ).
+    inspection->plain_list( IMPORTING p_list = plain_results ).
 
-    SORT me->plain_results BY objtype objname test code sobjtype sobjname line col.
+    SORT plain_results BY objtype objname test code sobjtype sobjname line col.
 
-    DELETE ADJACENT DUPLICATES FROM me->plain_results.
+    DELETE ADJACENT DUPLICATES FROM plain_results.
 
   ENDMETHOD.
 

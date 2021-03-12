@@ -54,10 +54,10 @@ CLASS zcl_dutils_oea_source_object IMPLEMENTATION.
   METHOD zif_dutils_oea_source_object~persist.
     DATA: used_objects_db TYPE zif_dutils_ty_oea=>ty_used_objects_db.
 
-    LOOP AT me->used_objects INTO DATA(used_object).
+    LOOP AT used_objects INTO DATA(used_object).
       DATA(used_object_data) = used_object->to_data( ).
       used_object_data-analysis_id = analysis_id.
-      used_object_data-source_obj_id = me->id.
+      used_object_data-source_obj_id = id.
       used_objects_db = VALUE #( BASE used_objects_db ( used_object_data ) ).
     ENDLOOP.
 
@@ -69,24 +69,24 @@ CLASS zcl_dutils_oea_source_object IMPLEMENTATION.
 
     data_access->insert_source_object( VALUE #(
       analysis_id         = analysis_id
-      source_obj_id       = me->id
-      generated           = me->generated
-      object_name         = me->name
-      object_display_name = me->display_name
-      object_type         = me->type
-      object_sub_type     = me->sub_type
-      parent_ref          = me->parent_ref
-      used_object_count   = lines( me->used_objects ) ) ).
+      source_obj_id       = id
+      generated           = generated
+      object_name         = name
+      object_display_name = display_name
+      object_type         = type
+      object_sub_type     = sub_type
+      parent_ref          = parent_ref
+      used_object_count   = lines( used_objects ) ) ).
 
     data_access->insert_used_objects( used_objects_db ).
 
   ENDMETHOD.
 
   METHOD zif_dutils_oea_source_object~determine_environment.
-    me->used_objects = get_env_service( )->determine_used_objects(
-      display_name  = CONV #( me->display_name )
-      name          = me->name
-      external_type = me->external_type ).
+    used_objects = get_env_service( )->determine_used_objects(
+      display_name  = CONV #( display_name )
+      name          = name
+      external_type = external_type ).
   ENDMETHOD.
 
   METHOD zif_dutils_oea_source_object~set_parent_ref.
@@ -99,22 +99,22 @@ CLASS zcl_dutils_oea_source_object IMPLEMENTATION.
 
   METHOD zif_dutils_oea_source_object~exists.
 
-    CASE me->external_type.
+    CASE external_type.
 
       WHEN zif_dutils_c_object_type=>function_module.
-        result = zcl_dutils_func_util=>function_exists( CONV #( me->display_name ) ).
+        result = zcl_dutils_func_util=>function_exists( CONV #( display_name ) ).
 
       WHEN zif_dutils_c_tadir_type=>package.
         " TMP packages that start with '$' are not in tadir so a packages will be handled
         " specially
         DATA(packages) = zcl_dutils_reader_factory=>get_package_reader( )->resolve_packages(
-          VALUE #( ( sign = 'I' option = 'EQ' low = me->display_name ) ) ).
+          VALUE #( ( sign = 'I' option = 'EQ' low = display_name ) ) ).
         result = xsdbool( lines( packages ) = 1 ).
 
       WHEN OTHERS.
         DATA(repo_result) = zcl_dutils_reader_factory=>create_repo_reader(
-          )->include_by_name( VALUE #( ( me->name ) )
-          )->include_by_type( VALUE #( ( me->external_type ) )
+          )->include_by_name( VALUE #( ( name ) )
+          )->include_by_type( VALUE #( ( external_type ) )
           )->select_single( ).
         result = xsdbool( repo_result IS NOT INITIAL ).
 
@@ -127,7 +127,7 @@ CLASS zcl_dutils_oea_source_object IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD zif_dutils_oea_source_object~needs_processing.
-    result = me->processing.
+    result = processing.
   ENDMETHOD.
 
   METHOD zif_dutils_oea_source_object~set_processing.
@@ -135,23 +135,23 @@ CLASS zcl_dutils_oea_source_object IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD zif_dutils_oea_object~get_display_name.
-    result = me->display_name.
+    result = display_name.
   ENDMETHOD.
 
   METHOD zif_dutils_oea_source_object~get_id.
-    result = me->id.
+    result = id.
   ENDMETHOD.
 
   METHOD zif_dutils_oea_object~get_name.
-    result = me->name.
+    result = name.
   ENDMETHOD.
 
   METHOD get_env_service.
-    IF me->env_service IS INITIAL.
-      me->env_service = zcl_dutils_oea_env_srv_factory=>create_env_service( me->external_type ).
+    IF env_service IS INITIAL.
+      env_service = zcl_dutils_oea_env_srv_factory=>create_env_service( external_type ).
     ENDIF.
 
-    result = me->env_service.
+    result = env_service.
   ENDMETHOD.
 
 

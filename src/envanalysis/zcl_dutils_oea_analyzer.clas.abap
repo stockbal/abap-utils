@@ -63,14 +63,14 @@ ENDCLASS.
 CLASS zcl_dutils_oea_analyzer IMPLEMENTATION.
 
   METHOD constructor.
-    me->tadir_obj_data = tadir_obj_data.
-    me->id = zcl_dutils_system_util=>create_sysuuid_x16( ).
-    me->analysis_info = VALUE #(
+    tadir_obj_data = tadir_obj_data.
+    id = zcl_dutils_system_util=>create_sysuuid_x16( ).
+    analysis_info = VALUE #(
       description = description ).
     me->parallel = parallel.
-    me->repo_reader = zcl_dutils_reader_factory=>create_repo_reader( ).
-    me->obj_env_dac = zcl_dutils_oea_dac=>get_instance( ).
-    me->tadir_obj_data = source_objects.
+    repo_reader = zcl_dutils_reader_factory=>create_repo_reader( ).
+    obj_env_dac = zcl_dutils_oea_dac=>get_instance( ).
+    tadir_obj_data = source_objects.
   ENDMETHOD.
 
   METHOD zif_dutils_oea_analyzer~run.
@@ -103,9 +103,9 @@ CLASS zcl_dutils_oea_analyzer IMPLEMENTATION.
       tstmp = valid_to
       secs  = c_two_hour_validity ).
 
-    me->analysis_info = VALUE zif_dutils_ty_oea=>ty_analysis_info_db(
-      BASE me->analysis_info
-      analysis_id = me->id
+    analysis_info = VALUE zif_dutils_ty_oea=>ty_analysis_info_db(
+      BASE analysis_info
+      analysis_id = id
       created_by  = sy-uname
       valid_to    = valid_to ).
 
@@ -114,35 +114,35 @@ CLASS zcl_dutils_oea_analyzer IMPLEMENTATION.
   METHOD resolve_source_objects.
     DATA: derived_source_objects TYPE TABLE OF REF TO zif_dutils_oea_source_object.
 
-    LOOP AT me->tadir_obj_data INTO DATA(tadir_obj_data).
+    LOOP AT tadir_obj_data INTO DATA(tadir_obj_data_entry).
       TRY.
           DATA(source_obj) = zcl_dutils_oea_factory=>create_source_object(
-            name          = tadir_obj_data-name
-            external_type = tadir_obj_data-type ).
+            name          = tadir_obj_data_entry-name
+            external_type = tadir_obj_data_entry-type ).
           IF NOT source_obj->exists( ).
             RAISE EXCEPTION TYPE zcx_dutils_not_exists
               EXPORTING
-                text = |Object with name { tadir_obj_data-name } | &&
-                       |and type { tadir_obj_data-type } does not exist|.
+                text = |Object with name { tadir_obj_data_entry-name } | &&
+                       |and type { tadir_obj_data_entry-type } does not exist|.
           ENDIF.
         CATCH zcx_dutils_no_wb_type.
           " source object is not usable, so skip it
           CONTINUE.
       ENDTRY.
 
-      IF tadir_obj_data-type = zif_dutils_c_tadir_type=>package.
+      IF tadir_obj_data_entry-type = zif_dutils_c_tadir_type=>package.
         source_obj->set_generated( ).
 
         derive_src_objects( source_obj ).
-        source_obj->persist( me->id ).
+        source_obj->persist( id ).
       ELSE.
         source_obj->set_processing( ).
-        me->source_objects = VALUE #( BASE me->source_objects ( source_obj ) ).
+        source_objects = VALUE #( BASE source_objects ( source_obj ) ).
       ENDIF.
 
     ENDLOOP.
 
-    IF me->source_objects IS INITIAL.
+    IF source_objects IS INITIAL.
       RAISE EXCEPTION TYPE zcx_dutils_exception
         EXPORTING
           text = |No Source objects could be resolved|.
@@ -150,7 +150,7 @@ CLASS zcl_dutils_oea_analyzer IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD derive_src_objects.
-    DATA(derived_objects) = me->repo_reader->reset(
+    DATA(derived_objects) = repo_reader->reset(
       )->include_by_package(
         packages            = VALUE #( ( source_object->get_display_name( ) ) )
         resolve_subpackages = abap_true
@@ -171,16 +171,16 @@ CLASS zcl_dutils_oea_analyzer IMPLEMENTATION.
       derived_src_obj->set_parent_ref( source_object->get_id( ) ).
       derived_src_obj->set_processing( ).
 
-      me->source_objects = VALUE #( BASE me->source_objects ( derived_src_obj ) ).
+      source_objects = VALUE #( BASE source_objects ( derived_src_obj ) ).
 
     ENDLOOP.
 
   ENDMETHOD.
 
   METHOD persist_src_objects.
-    CHECK me->source_objects_flat IS NOT INITIAL.
+    CHECK source_objects_flat IS NOT INITIAL.
 
-    me->obj_env_dac->insert_source_objects( me->source_objects_flat ).
+    obj_env_dac->insert_source_objects( source_objects_flat ).
   ENDMETHOD.
 
   METHOD analyze.
@@ -188,7 +188,7 @@ CLASS zcl_dutils_oea_analyzer IMPLEMENTATION.
 
     DATA(is_parallel) = is_parallel_active( ).
 
-    LOOP AT me->source_objects INTO DATA(src_obj).
+    LOOP AT source_objects INTO DATA(src_obj).
       CHECK src_obj->needs_processing( ).
 
       IF is_parallel = abap_true.
@@ -197,21 +197,21 @@ CLASS zcl_dutils_oea_analyzer IMPLEMENTATION.
         run_serial( src_obj ).
       ENDIF.
 
-      DELETE me->source_objects.
+      DELETE source_objects.
     ENDLOOP.
 
     GET TIME STAMP FIELD DATA(end_time).
 
-    me->analysis_info-duration = cl_abap_tstmp=>subtract(
+    analysis_info-duration = cl_abap_tstmp=>subtract(
       tstmp1 = end_time
       tstmp2 = start_time ).
 
-    me->obj_env_dac->insert_analysis_info( me->analysis_info ).
+    obj_env_dac->insert_analysis_info( analysis_info ).
 
   ENDMETHOD.
 
   METHOD is_parallel_active.
-    result = xsdbool( me->parallel = abap_true AND lines( me->source_objects_flat ) > 1 ).
+    result = xsdbool( parallel = abap_true AND lines( source_objects_flat ) > 1 ).
   ENDMETHOD.
 
   METHOD run_parallel.
@@ -220,12 +220,12 @@ CLASS zcl_dutils_oea_analyzer IMPLEMENTATION.
 
   METHOD run_serial.
     source_object->determine_environment( ).
-    source_object->persist( me->id ).
+    source_object->persist( id ).
     source_object->set_processing( abap_false ).
   ENDMETHOD.
 
   METHOD zif_dutils_oea_analyzer~get_duration.
-    result = me->analysis_info-duration.
+    result = analysis_info-duration.
   ENDMETHOD.
 
 ENDCLASS.
