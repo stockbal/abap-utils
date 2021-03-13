@@ -8,7 +8,7 @@ Utilities for ABAP Development
   Miscellaneous objects
 - **/src/ci**  
   Contains Classes/interfaces for Code Inspector Handling
-- **/src/envanalysis (WIP)**  
+- **/src/oea (WIP)**  
   Contains Classes/interfaces for Object Environment Analysis  
   
   Important Objects in package  
