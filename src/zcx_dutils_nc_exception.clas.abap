@@ -63,6 +63,6 @@ CLASS zcx_dutils_nc_exception IMPLEMENTATION.
       if_t100_message~t100key = if_t100_message=>default_textid.
     ENDIF.
 
-    previous = previous.
+    me->previous = previous.
   ENDMETHOD.
 ENDCLASS.
