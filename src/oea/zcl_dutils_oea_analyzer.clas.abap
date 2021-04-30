@@ -198,15 +198,12 @@ CLASS zcl_dutils_oea_analyzer IMPLEMENTATION.
       is_parallel = parallel_runner->has_enough_tasks( ).
     ENDIF.
 
-    DATA(index) = 0.
     LOOP AT source_objects INTO DATA(src_obj).
-      index = index + 1.
       CHECK src_obj->needs_processing( ).
 
       IF is_parallel = abap_true.
         parallel_runner->run(
           analysis_id   = analysis_info-analysis_id
-          task_name     = |ENV_ANALYSIS:{ index }|
           source_object = src_obj ).
       ELSE.
         run_serial( src_obj ).

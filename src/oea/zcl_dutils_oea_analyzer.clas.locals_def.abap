@@ -17,7 +17,6 @@ CLASS lcl_parallel_analyzer DEFINITION.
       run
         IMPORTING
           analysis_id   TYPE sysuuid_x16
-          task_name     TYPE zif_dutils_ty_global=>ty_task_name
           source_object TYPE REF TO zif_dutils_oea_source_object,
       wait_until_free_task,
       wait_until_finished,
@@ -26,7 +25,11 @@ CLASS lcl_parallel_analyzer DEFINITION.
           p_task TYPE clike.
   PROTECTED SECTION.
   PRIVATE SECTION.
+    CONSTANTS:
+      c_task_name_prefix TYPE string VALUE 'ENVANALYSIS:'.
+
     DATA:
+      task_number TYPE i,
       free_tasks  TYPE i,
       group       TYPE rzlli_apcl,
       max_tasks   TYPE i,

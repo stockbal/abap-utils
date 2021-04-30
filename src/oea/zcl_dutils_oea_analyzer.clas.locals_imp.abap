@@ -21,6 +21,9 @@ CLASS lcl_parallel_analyzer IMPLEMENTATION.
 
     ASSERT free_tasks > 0.
 
+    ADD 1 TO task_number.
+    DATA(task_name) = |{ c_task_name_prefix }{ task_number }|.
+
     DATA(src_obj_data) = source_object->to_structure( ).
     DO.
       CALL FUNCTION 'ZDUTILS_OEA_PARL_GET_ENV'
