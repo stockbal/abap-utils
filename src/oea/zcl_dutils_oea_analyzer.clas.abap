@@ -6,8 +6,7 @@ CLASS zcl_dutils_oea_analyzer DEFINITION
 
   PUBLIC SECTION.
     INTERFACES:
-      zif_dutils_oea_analyzer,
-      zif_dutils_oea_analyzer_par.
+      zif_dutils_oea_analyzer.
 
     METHODS:
       "! <p class="shorttext synchronized" lang="en">Create new Analyzer instance</p>
@@ -30,7 +29,9 @@ CLASS zcl_dutils_oea_analyzer DEFINITION
       repo_reader          TYPE REF TO zif_dutils_tadir_reader,
       obj_env_dac          TYPE REF TO zif_dutils_oea_dac,
       analysis_info        TYPE zif_dutils_ty_oea=>ty_analysis_info_db,
-      analyzed_with_errors TYPE abap_bool.
+      analyzed_with_errors TYPE abap_bool,
+      free_tasks           TYPE i,
+      server_group         TYPE rzlli_apcl.
 
     METHODS:
       "! <p class="shorttext synchronized" lang="en">Fills analysis information</p>
@@ -46,9 +47,6 @@ CLASS zcl_dutils_oea_analyzer DEFINITION
       is_parallel_active
         RETURNING
           VALUE(result) TYPE abap_bool,
-      run_parallel
-        IMPORTING
-          source_object TYPE REF TO zif_dutils_oea_source_object,
       run_serial
         IMPORTING
           source_object TYPE REF TO zif_dutils_oea_source_object,
@@ -62,6 +60,7 @@ ENDCLASS.
 
 CLASS zcl_dutils_oea_analyzer IMPLEMENTATION.
 
+
   METHOD constructor.
     tadir_obj_data = tadir_obj_data.
     id = zcl_dutils_system_util=>create_sysuuid_x16( ).
@@ -72,6 +71,7 @@ CLASS zcl_dutils_oea_analyzer IMPLEMENTATION.
     obj_env_dac = zcl_dutils_oea_dac=>get_instance( ).
     tadir_obj_data = source_objects.
   ENDMETHOD.
+
 
   METHOD zif_dutils_oea_analyzer~run.
 
@@ -88,13 +88,11 @@ CLASS zcl_dutils_oea_analyzer IMPLEMENTATION.
 
   ENDMETHOD.
 
-  METHOD zif_dutils_oea_analyzer_par~run.
-
-  ENDMETHOD.
 
   METHOD zif_dutils_oea_analyzer~get_result.
 
   ENDMETHOD.
+
 
   METHOD fill_analysis_info.
     GET TIME STAMP FIELD DATA(valid_to).
@@ -110,6 +108,7 @@ CLASS zcl_dutils_oea_analyzer IMPLEMENTATION.
       valid_to    = valid_to ).
 
   ENDMETHOD.
+
 
   METHOD resolve_source_objects.
     DATA: derived_source_objects TYPE TABLE OF REF TO zif_dutils_oea_source_object.
@@ -149,6 +148,7 @@ CLASS zcl_dutils_oea_analyzer IMPLEMENTATION.
     ENDIF.
   ENDMETHOD.
 
+
   METHOD derive_src_objects.
     DATA(derived_objects) = repo_reader->reset(
       )->include_by_package(
@@ -177,28 +177,47 @@ CLASS zcl_dutils_oea_analyzer IMPLEMENTATION.
 
   ENDMETHOD.
 
+
   METHOD persist_src_objects.
     CHECK source_objects_flat IS NOT INITIAL.
 
     obj_env_dac->insert_source_objects( source_objects_flat ).
   ENDMETHOD.
 
+
   METHOD analyze.
+    DATA: parallel_runner TYPE REF TO lcl_parallel_analyzer.
+
     GET TIME STAMP FIELD DATA(start_time).
 
     DATA(is_parallel) = is_parallel_active( ).
 
+    IF is_parallel = abap_true.
+      parallel_runner = NEW #( ).
+      " only continue in parallel mode if system has the capacity
+      is_parallel = parallel_runner->has_enough_tasks( ).
+    ENDIF.
+
+    DATA(index) = 0.
     LOOP AT source_objects INTO DATA(src_obj).
+      index = index + 1.
       CHECK src_obj->needs_processing( ).
 
       IF is_parallel = abap_true.
-        run_parallel( src_obj ).
+        parallel_runner->run(
+          analysis_id   = analysis_info-analysis_id
+          task_name     = |ENV_ANALYSIS:{ index }|
+          source_object = src_obj ).
       ELSE.
         run_serial( src_obj ).
       ENDIF.
 
       DELETE source_objects.
     ENDLOOP.
+
+    IF is_parallel = abap_true AND parallel_runner IS BOUND.
+      parallel_runner->wait_until_finished( ).
+    ENDIF.
 
     GET TIME STAMP FIELD DATA(end_time).
 
@@ -210,13 +229,11 @@ CLASS zcl_dutils_oea_analyzer IMPLEMENTATION.
 
   ENDMETHOD.
 
+
   METHOD is_parallel_active.
-    result = xsdbool( parallel = abap_true AND lines( source_objects_flat ) > 1 ).
+    result = xsdbool( parallel = abap_true AND lines( source_objects ) > 1 ).
   ENDMETHOD.
 
-  METHOD run_parallel.
-
-  ENDMETHOD.
 
   METHOD run_serial.
     source_object->determine_environment( ).
@@ -224,8 +241,10 @@ CLASS zcl_dutils_oea_analyzer IMPLEMENTATION.
     source_object->set_processing( abap_false ).
   ENDMETHOD.
 
+
   METHOD zif_dutils_oea_analyzer~get_duration.
     result = analysis_info-duration.
   ENDMETHOD.
+
 
 ENDCLASS.

@@ -10,7 +10,7 @@ INTERFACE zif_dutils_oea_source_object
     get_display_name FOR zif_dutils_oea_object~get_display_name.
 
   TYPES:
-    ty_table TYPE STANDARD TABLE OF REF TO zif_dutils_oea_source_object with EMPTY KEY.
+    ty_table TYPE STANDARD TABLE OF REF TO zif_dutils_oea_source_object WITH EMPTY KEY.
 
   METHODS:
     "! <p class="shorttext synchronized" lang="en">Checks if the source object exists</p>
@@ -54,5 +54,10 @@ INTERFACE zif_dutils_oea_source_object
     "! <p class="shorttext synchronized" lang="en">Returns value for the flag 'processing'</p>
     needs_processing
       RETURNING
-        VALUE(result) TYPE abap_bool.
+        VALUE(result) TYPE abap_bool,
+
+    "! <p class="shorttext synchronized" lang="en">Returns the object in structure form</p>
+    to_structure
+      RETURNING
+        VALUE(result) TYPE zif_dutils_ty_oea=>ty_source_object_ext.
 ENDINTERFACE.

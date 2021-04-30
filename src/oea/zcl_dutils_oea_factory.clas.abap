@@ -31,7 +31,17 @@ CLASS zcl_dutils_oea_factory DEFINITION
           VALUE(result) TYPE REF TO zif_dutils_oea_source_object
         RAISING
           zcx_dutils_no_wb_type
-          zcx_dutils_not_exists.
+          zcx_dutils_not_exists,
+      "! <p class="shorttext synchronized" lang="en">Creates fully defined source object</p>
+      create_source_object_no_check
+        IMPORTING
+          name          TYPE sobj_name
+          display_name  TYPE sobj_name
+          type          TYPE trobjtype
+          sub_type      TYPE seu_objtyp
+          external_type TYPE trobjtype
+        RETURNING
+          VALUE(result) TYPE REF TO zif_dutils_oea_source_object.
   PROTECTED SECTION.
   PRIVATE SECTION.
 ENDCLASS.
@@ -40,12 +50,14 @@ ENDCLASS.
 
 CLASS zcl_dutils_oea_factory IMPLEMENTATION.
 
+
   METHOD create_analyzer.
     result = NEW zcl_dutils_oea_analyzer(
       description    = description
       source_objects = source_objects
       parallel       = parallel ).
   ENDMETHOD.
+
 
   METHOD create_source_object.
     DATA(wb_object) = zcl_dutils_wb_obj_srv_factory=>get_service( external_type )->get_wb_object(
@@ -59,6 +71,17 @@ CLASS zcl_dutils_oea_factory IMPLEMENTATION.
       sub_type     = wb_object-sub_type
       external_type = external_type ).
   ENDMETHOD.
+
+
+  METHOD create_source_object_no_check.
+    result = NEW zcl_dutils_oea_source_object(
+      name          = name
+      display_name  = display_name
+      type          = type
+      sub_type      = sub_type
+      external_type = external_type ).
+  ENDMETHOD.
+
 
   METHOD create_used_object.
     TRY.
@@ -75,5 +98,6 @@ CLASS zcl_dutils_oea_factory IMPLEMENTATION.
       type         = wb_object-type
       sub_type     = wb_object-sub_type ).
   ENDMETHOD.
+
 
 ENDCLASS.

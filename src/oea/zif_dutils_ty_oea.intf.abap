@@ -11,7 +11,8 @@ INTERFACE zif_dutils_ty_oea
   TYPES BEGIN OF ty_source_object_ext.
   INCLUDE TYPE ty_source_object_db.
   TYPES: package          TYPE devclass,
-         needs_processing TYPE abap_bool.
+         needs_processing TYPE abap_bool,
+         external_type    TYPE trobjtype.
   TYPES END OF ty_source_object_ext.
 
   "! <p class="shorttext synchronized" lang="en">Used object</p>

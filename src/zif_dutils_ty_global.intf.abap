@@ -27,6 +27,8 @@ INTERFACE zif_dutils_ty_global
     END OF ty_function_info.
 
   TYPES:
+    "! <p class="shorttext synchronized" lang="en">Task name for parallel processing</p>
+    ty_task_name                TYPE c LENGTH 32,
     "! Range of UUID C32
     ty_uuid_c32_range           TYPE RANGE OF sysuuid_c32,
 

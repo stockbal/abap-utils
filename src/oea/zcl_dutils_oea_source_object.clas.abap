@@ -42,6 +42,7 @@ ENDCLASS.
 
 CLASS zcl_dutils_oea_source_object IMPLEMENTATION.
 
+
   METHOD constructor.
     me->name = name.
     me->display_name = display_name.
@@ -50,6 +51,7 @@ CLASS zcl_dutils_oea_source_object IMPLEMENTATION.
     me->type = type.
     me->id = zcl_dutils_system_util=>create_sysuuid_x16( ).
   ENDMETHOD.
+
 
   METHOD zif_dutils_oea_source_object~persist.
     DATA: used_objects_db TYPE zif_dutils_ty_oea=>ty_used_objects_db.
@@ -82,6 +84,7 @@ CLASS zcl_dutils_oea_source_object IMPLEMENTATION.
 
   ENDMETHOD.
 
+
   METHOD zif_dutils_oea_source_object~determine_environment.
     used_objects = get_env_service( )->determine_used_objects(
       display_name  = CONV #( display_name )
@@ -89,13 +92,16 @@ CLASS zcl_dutils_oea_source_object IMPLEMENTATION.
       external_type = external_type ).
   ENDMETHOD.
 
+
   METHOD zif_dutils_oea_source_object~set_parent_ref.
     me->parent_ref = parent_ref.
   ENDMETHOD.
 
+
   METHOD zif_dutils_oea_source_object~set_id.
     me->id = id.
   ENDMETHOD.
+
 
   METHOD zif_dutils_oea_source_object~exists.
 
@@ -122,29 +128,50 @@ CLASS zcl_dutils_oea_source_object IMPLEMENTATION.
 
   ENDMETHOD.
 
+
   METHOD zif_dutils_oea_source_object~set_generated.
     me->generated = generated.
   ENDMETHOD.
+
 
   METHOD zif_dutils_oea_source_object~needs_processing.
     result = processing.
   ENDMETHOD.
 
+
   METHOD zif_dutils_oea_source_object~set_processing.
     me->processing = processing.
   ENDMETHOD.
 
-  METHOD zif_dutils_oea_object~get_display_name.
-    result = display_name.
-  ENDMETHOD.
 
   METHOD zif_dutils_oea_source_object~get_id.
     result = id.
   ENDMETHOD.
 
+
+  METHOD zif_dutils_oea_source_object~to_structure.
+    result = VALUE zif_dutils_ty_oea=>ty_source_object_ext(
+      source_obj_id       = id
+      object_type         = type
+      object_sub_type     = sub_type
+      external_type       = external_type
+      object_name         = name
+      object_display_name = display_name
+      parent_ref          = parent_ref
+      generated           = generated
+      needs_processing    = processing ).
+  ENDMETHOD.
+
+
+  METHOD zif_dutils_oea_object~get_display_name.
+    result = display_name.
+  ENDMETHOD.
+
+
   METHOD zif_dutils_oea_object~get_name.
     result = name.
   ENDMETHOD.
+
 
   METHOD get_env_service.
     IF env_service IS INITIAL.

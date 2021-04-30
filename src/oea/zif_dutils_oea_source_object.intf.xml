@@ -65,6 +65,12 @@
      <LANGU>E</LANGU>
      <DESCRIPT>Sets the value for the &apos;processing&apos; flag</DESCRIPT>
     </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZIF_DUTILS_OEA_SOURCE_OBJECT</CLSNAME>
+     <CMPNAME>TO_STRUCTURE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Returns the object in structure form</DESCRIPT>
+    </SEOCOMPOTX>
    </DESCRIPTIONS>
   </asx:values>
  </asx:abap>
