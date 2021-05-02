@@ -29,13 +29,23 @@ ENDCLASS.
 CLASS zcl_dutils_wb_obj_sicf_srv IMPLEMENTATION.
 
   METHOD zif_dutils_wb_obj_service~get_wb_object.
+    DATA: service_url TYPE string.
     result-type = external_type.
+
+    " Fallback solution to determine tadir name from service URL
     IF display_name CP '/*'.
       result-name = get_sicf_from_url( CONV #( display_name ) ).
-      result-display_name = read_sicf_url( result-name ).
+      service_url = read_sicf_url( result-name ).
     ELSE.
       result-name = display_name.
-      result-display_name = read_sicf_url( display_name ).
+      service_url = read_sicf_url( display_name ).
+    ENDIF.
+
+    IF service_url IS NOT INITIAL AND
+        strlen( service_url ) <= 40.
+      result-display_name = service_url.
+    ELSE.
+      result-long_display_name = service_url.
     ENDIF.
   ENDMETHOD.
 
@@ -52,20 +62,23 @@ CLASS zcl_dutils_wb_obj_sicf_srv IMPLEMENTATION.
 
     CALL FUNCTION 'HTTP_GET_URL_FROM_NODGUID'
       EXPORTING
-        nodguid     = icf_guid
+        nodguid      = icf_guid
       IMPORTING
-        url         = url
+        extended_url = result
       EXCEPTIONS
-        icf_inconst = 1
-        OTHERS      = 2.
+        icf_inconst  = 1
+        OTHERS       = 2.
 
-    IF sy-subrc = 0.
-      result = url.
+    IF sy-subrc <> 0.
+      CLEAR result.
     ENDIF.
   ENDMETHOD.
 
 
   METHOD get_sicf_from_url.
+    DATA: service_name     TYPE icfname,
+          alt_service_name TYPE icfaltnme.
+
     " offset +1 to skip the first '/'
     SPLIT url+1 AT '/' INTO TABLE DATA(url_parts).
 
@@ -74,9 +87,13 @@ CLASS zcl_dutils_wb_obj_sicf_srv IMPLEMENTATION.
     LOOP AT url_parts INTO DATA(url_part).
       TRANSLATE url_part TO UPPER CASE.
 
+      service_name = url_part.
+      alt_service_name = url_part.
+
       SELECT SINGLE icfnodguid, icfparguid
         FROM icfservice
-        WHERE icf_name = @url_part
+        WHERE ( icf_name = @service_name OR
+                icfaltnme = @alt_service_name )
           AND icfparguid = @node_guid
         INTO ( @node_guid, @DATA(parent_node_guid) ).
     ENDLOOP.

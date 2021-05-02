@@ -98,5 +98,6 @@ INTERFACE zif_dutils_ty_global
   TYPES type TYPE trobjtype.
   TYPES sub_type TYPE seu_objtyp.
   INCLUDE TYPE ty_wb_object_name.
+  TYPES long_display_name TYPE string.
   TYPES END OF ty_wb_object.
 ENDINTERFACE.
