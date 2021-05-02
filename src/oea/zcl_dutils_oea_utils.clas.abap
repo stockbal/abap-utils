@@ -8,12 +8,12 @@ CLASS zcl_dutils_oea_utils DEFINITION
     CLASS-METHODS:
       "! <p class="shorttext synchronized" lang="en">Determine used objects for the given object</p>
       "! @parameter object | Object that should be analyzed
-      "! @parameter aggregate_level | Level of aggregation that should be performed
+      "! @parameter aggregation_level | Level of aggregation that should be performed
       "! @parameter with_parameters | if 'X' parameters of methods and function modules are also analyzed
       get_used_objects
         IMPORTING
           object              TYPE zif_dutils_ty_global=>ty_tadir_object
-          aggregate_level     TYPE zif_dutils_ty_oea=>ty_aggregation_level DEFAULT zif_dutils_c_oea=>c_aggregation_level-by_type
+          aggregation_level   TYPE zif_dutils_ty_oea=>ty_aggregation_level DEFAULT zif_dutils_c_oea=>c_aggregation_level-by_type
           with_parameters     TYPE abap_bool OPTIONAL
         RETURNING
           VALUE(used_objects) TYPE zif_dutils_ty_oea=>ty_used_objects.
@@ -37,7 +37,7 @@ CLASS zcl_dutils_oea_utils IMPLEMENTATION.
         object_name     = object-name
         deep            = c_direct_usages
         with_parameters = with_parameters
-        aggregate_level = aggregate_level
+        aggregate_level = aggregation_level
       TABLES
         environment_tab = env_tab.
 
