@@ -18,5 +18,5 @@ INTERFACE zif_dutils_oea_analyzer
     "! <p class="shorttext synchronized" lang="en">Returns duration of analysis</p>
     get_duration
       RETURNING
-        VALUE(result) TYPE timestamp.
+        VALUE(result) TYPE timestampl.
 ENDINTERFACE.

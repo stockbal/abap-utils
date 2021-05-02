@@ -42,8 +42,6 @@ CLASS zcl_dutils_oea_analyzer DEFINITION
       resolve_source_objects
         RAISING
           zcx_dutils_exception,
-      "! <p class="shorttext synchronized" lang="en">Persists all source objects</p>
-      persist_src_objects,
       is_parallel_active
         RETURNING
           VALUE(result) TYPE abap_bool,
@@ -95,17 +93,10 @@ CLASS zcl_dutils_oea_analyzer IMPLEMENTATION.
 
 
   METHOD fill_analysis_info.
-    GET TIME STAMP FIELD DATA(valid_to).
-
-    valid_to = cl_abap_tstmp=>add(
-      tstmp = valid_to
-      secs  = c_two_hour_validity ).
-
     analysis_info = VALUE zif_dutils_ty_oea=>ty_analysis_info_db(
       BASE analysis_info
       analysis_id = id
-      created_by  = sy-uname
-      valid_to    = valid_to ).
+      created_by  = sy-uname ).
 
   ENDMETHOD.
 
@@ -178,17 +169,12 @@ CLASS zcl_dutils_oea_analyzer IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD persist_src_objects.
-    CHECK source_objects_flat IS NOT INITIAL.
-
-    obj_env_dac->insert_source_objects( source_objects_flat ).
-  ENDMETHOD.
-
-
   METHOD analyze.
-    DATA: parallel_runner TYPE REF TO lcl_parallel_analyzer.
+    DATA: parallel_runner TYPE REF TO lcl_parallel_analyzer,
+          start_time      TYPE timestampl,
+          end_time        TYPE timestampl.
 
-    GET TIME STAMP FIELD DATA(start_time).
+    GET TIME STAMP FIELD start_time.
 
     DATA(is_parallel) = is_parallel_active( ).
 
@@ -216,8 +202,13 @@ CLASS zcl_dutils_oea_analyzer IMPLEMENTATION.
       parallel_runner->wait_until_finished( ).
     ENDIF.
 
-    GET TIME STAMP FIELD DATA(end_time).
+    GET TIME STAMP FIELD end_time.
 
+    GET TIME STAMP FIELD analysis_info-created_at.
+
+    analysis_info-valid_to = cl_abap_tstmp=>add(
+      tstmp = analysis_info-created_at
+      secs  = c_two_hour_validity ).
     analysis_info-duration = cl_abap_tstmp=>subtract(
       tstmp1 = end_time
       tstmp2 = start_time ).

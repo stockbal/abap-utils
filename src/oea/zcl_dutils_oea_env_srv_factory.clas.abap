@@ -41,10 +41,10 @@ CLASS zcl_dutils_oea_env_srv_factory IMPLEMENTATION.
   METHOD create_env_service.
     DATA(service_type) = get_service_type( obj_type ).
     TRY.
-        result = services[ type = obj_type ]-service.
+        result = services[ type = service_type ]-service.
       CATCH cx_sy_itab_line_not_found.
 
-        CASE obj_type.
+        CASE service_type.
 
           WHEN zif_dutils_c_tadir_type=>business_object.
             result = NEW zcl_dutils_oea_bobf_env_srv( ).
