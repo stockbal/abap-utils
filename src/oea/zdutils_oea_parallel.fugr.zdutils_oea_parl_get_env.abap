@@ -1,7 +1,7 @@
 FUNCTION zdutils_oea_parl_get_env.
 *"----------------------------------------------------------------------
 *"*"Local Interface:
-*"  EXPORTING
+*"  IMPORTING
 *"     VALUE(ANALYSIS_ID) TYPE  SYSUUID_X16
 *"     VALUE(NAME) TYPE  SOBJ_NAME
 *"     VALUE(DISPLAY_NAME) TYPE  SOBJ_NAME

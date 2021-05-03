@@ -12,32 +12,32 @@
      <FUNCNAME>ZDUTILS_OEA_PARL_GET_ENV</FUNCNAME>
      <REMOTE_CALL>R</REMOTE_CALL>
      <SHORT_TEXT>Retrieves Environment of a given object</SHORT_TEXT>
-     <EXPORT>
-      <RSEXP>
+     <IMPORT>
+      <RSIMP>
        <PARAMETER>ANALYSIS_ID</PARAMETER>
        <TYP>SYSUUID_X16</TYP>
-      </RSEXP>
-      <RSEXP>
+      </RSIMP>
+      <RSIMP>
        <PARAMETER>NAME</PARAMETER>
        <TYP>SOBJ_NAME</TYP>
-      </RSEXP>
-      <RSEXP>
+      </RSIMP>
+      <RSIMP>
        <PARAMETER>DISPLAY_NAME</PARAMETER>
        <TYP>SOBJ_NAME</TYP>
-      </RSEXP>
-      <RSEXP>
+      </RSIMP>
+      <RSIMP>
        <PARAMETER>TYPE</PARAMETER>
        <TYP>TROBJTYPE</TYP>
-      </RSEXP>
-      <RSEXP>
+      </RSIMP>
+      <RSIMP>
        <PARAMETER>SUB_TYPE</PARAMETER>
        <TYP>SEU_OBJTYP</TYP>
-      </RSEXP>
-      <RSEXP>
+      </RSIMP>
+      <RSIMP>
        <PARAMETER>EXTERNAL_TYPE</PARAMETER>
        <TYP>TROBJTYPE</TYP>
-      </RSEXP>
-     </EXPORT>
+      </RSIMP>
+     </IMPORT>
      <EXCEPTION>
       <RSEXC>
        <EXCEPTION>ERROR</EXCEPTION>
