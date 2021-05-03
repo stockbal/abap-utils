@@ -14,6 +14,11 @@ CLASS zcl_dutils_oea_bobf_env_srv DEFINITION
       c_bobf_prefix_sql TYPE classname VALUE '/BOBF/%'.
 
     METHODS:
+      find_bo_properties
+        IMPORTING
+          bo_name      TYPE /bobf/obm_name
+        CHANGING
+          used_objects TYPE zif_dutils_oea_used_object=>ty_table,
       find_actions
         IMPORTING
           bo_name      TYPE /bobf/obm_name
@@ -55,6 +60,9 @@ CLASS zcl_dutils_oea_bobf_env_srv IMPLEMENTATION.
   METHOD zif_dutils_oea_env_service~determine_used_objects.
     DATA(bo_name) = CONV /bobf/obm_name( name ).
 
+    find_bo_properties(
+      EXPORTING bo_name = bo_name
+      CHANGING  used_objects = result ).
     find_actions(
       EXPORTING bo_name = bo_name
       CHANGING  used_objects = result ).
@@ -71,6 +79,26 @@ CLASS zcl_dutils_oea_bobf_env_srv IMPLEMENTATION.
       EXPORTING bo_name = bo_name
       CHANGING used_objects = result ).
 
+  ENDMETHOD.
+
+
+  METHOD find_bo_properties.
+    SELECT SINGLE const_interface,
+           object_model_cds_view_name
+      FROM /bobf/obm_obj
+      WHERE name = @bo_name
+      INTO @DATA(bo_properties).
+
+    IF sy-subrc = 0.
+      add_used_object(
+        EXPORTING used_obj_name = bo_properties-const_interface
+                  external_type = zif_dutils_c_tadir_type=>interface
+        CHANGING  used_objects  = used_objects ).
+      add_used_object(
+        EXPORTING used_obj_name = bo_properties-object_model_cds_view_name
+                  external_type = zif_dutils_c_tadir_type=>structured_object
+        CHANGING  used_objects  = used_objects ).
+    ENDIF.
   ENDMETHOD.
 
 
