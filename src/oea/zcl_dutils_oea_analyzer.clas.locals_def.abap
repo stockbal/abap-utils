@@ -8,7 +8,8 @@ CLASS lcl_parallel_analyzer DEFINITION.
       "! Creates new parallel processor
       constructor
         IMPORTING
-          group_name TYPE rzlli_apcl OPTIONAL,
+          group_name TYPE rzlli_apcl OPTIONAL
+          max_tasks  TYPE i OPTIONAL,
       "! Returns 'X' if there are enough tasks
       has_enough_tasks
         RETURNING

@@ -6,7 +6,15 @@ CLASS lcl_parallel_analyzer IMPLEMENTATION.
 
   METHOD constructor.
     group = group_name.
-    max_tasks = zcl_dutils_parl_proc_utils=>determine_max_tasks( group ).
+
+    DATA(max_group_tasks) = zcl_dutils_parl_proc_utils=>determine_max_tasks( group ).
+    IF max_tasks IS INITIAL OR max_tasks > max_group_tasks.
+      me->max_tasks = max_group_tasks.
+    ELSEIF max_tasks > 0.
+      me->max_tasks = max_tasks.
+    ELSE.
+      me->max_tasks = 1.
+    ENDIF.
   ENDMETHOD.
 
 

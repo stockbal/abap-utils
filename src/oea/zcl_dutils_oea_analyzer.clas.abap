@@ -14,7 +14,8 @@ CLASS zcl_dutils_oea_analyzer DEFINITION
         IMPORTING
           description    TYPE string
           source_objects TYPE zif_dutils_ty_global=>ty_tadir_objects
-          parallel       TYPE abap_bool OPTIONAL.
+          parallel       TYPE abap_bool OPTIONAL
+          max_tasks      TYPE i DEFAULT 12.
   PROTECTED SECTION.
   PRIVATE SECTION.
     CONSTANTS:
@@ -26,6 +27,7 @@ CLASS zcl_dutils_oea_analyzer DEFINITION
       source_objects_flat  TYPE zif_dutils_ty_oea=>ty_source_objects_ext,
       source_objects       TYPE zif_dutils_oea_source_object=>ty_table,
       parallel             TYPE abap_bool,
+      max_tasks            TYPE i,
       repo_reader          TYPE REF TO zif_dutils_tadir_reader,
       obj_env_dac          TYPE REF TO zif_dutils_oea_dac,
       analysis_info        TYPE zif_dutils_ty_oea=>ty_analysis_info_db,
@@ -65,6 +67,7 @@ CLASS zcl_dutils_oea_analyzer IMPLEMENTATION.
     analysis_info = VALUE #(
       description = description ).
     me->parallel = parallel.
+    me->max_tasks = max_tasks.
     repo_reader = zcl_dutils_reader_factory=>create_repo_reader( ).
     obj_env_dac = zcl_dutils_oea_dac=>get_instance( ).
     tadir_obj_data = source_objects.
@@ -179,7 +182,7 @@ CLASS zcl_dutils_oea_analyzer IMPLEMENTATION.
     DATA(is_parallel) = is_parallel_active( ).
 
     IF is_parallel = abap_true.
-      parallel_runner = NEW #( ).
+      parallel_runner = NEW #( max_tasks = max_tasks ).
       " only continue in parallel mode if system has the capacity
       is_parallel = parallel_runner->has_enough_tasks( ).
     ENDIF.
