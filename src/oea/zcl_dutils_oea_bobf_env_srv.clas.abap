@@ -9,10 +9,6 @@ CLASS zcl_dutils_oea_bobf_env_srv DEFINITION
       zif_dutils_oea_env_service.
   PROTECTED SECTION.
   PRIVATE SECTION.
-    CONSTANTS:
-      c_bobf_prefix     TYPE classname VALUE '/BOBF/*',
-      c_bobf_prefix_sql TYPE classname VALUE '/BOBF/%'.
-
     METHODS:
       find_bo_properties
         IMPORTING
@@ -144,7 +140,6 @@ CLASS zcl_dutils_oea_bobf_env_srv IMPLEMENTATION.
 
 
   METHOD find_actions.
-    " TODO: Check if only custom actions should be displayed
     SELECT act_class,
            param_data_type,
            export_param_s,
@@ -152,7 +147,6 @@ CLASS zcl_dutils_oea_bobf_env_srv IMPLEMENTATION.
       FROM /bobf/act_list
       WHERE name = @bo_name
         AND act_class IS NOT INITIAL
-        AND object_model_generated = @abap_false
       INTO TABLE @DATA(bo_actions).
 
     DEFINE _add_used_obj.
@@ -178,8 +172,6 @@ CLASS zcl_dutils_oea_bobf_env_srv IMPLEMENTATION.
       FROM /bobf/det_list
       WHERE name = @bo_name
         AND det_class IS NOT INITIAL
-        AND det_class NOT LIKE @c_bobf_prefix_sql
-        AND object_model_generated = @abap_false
       INTO TABLE @DATA(bo_determinations).
 
     LOOP AT bo_determinations ASSIGNING FIELD-SYMBOL(<determination>).
@@ -196,8 +188,6 @@ CLASS zcl_dutils_oea_bobf_env_srv IMPLEMENTATION.
       FROM /bobf/val_list
       WHERE name = @bo_name
         AND val_class IS NOT INITIAL
-        AND val_class NOT LIKE @c_bobf_prefix_sql
-        AND object_model_generated = @abap_false
       INTO TABLE @DATA(bo_validations).
 
     LOOP AT bo_validations ASSIGNING FIELD-SYMBOL(<validation>).
@@ -231,8 +221,7 @@ CLASS zcl_dutils_oea_bobf_env_srv IMPLEMENTATION.
 
 
   METHOD add_used_object.
-    CHECK: used_obj_name IS NOT INITIAL,
-           used_obj_name NP c_bobf_prefix.
+    CHECK used_obj_name IS NOT INITIAL.
 
     APPEND zcl_dutils_oea_factory=>create_used_object(
       name          = CONV #( used_obj_name )
