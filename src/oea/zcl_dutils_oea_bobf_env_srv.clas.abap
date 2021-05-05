@@ -9,6 +9,25 @@ CLASS zcl_dutils_oea_bobf_env_srv DEFINITION
       zif_dutils_oea_env_service.
   PROTECTED SECTION.
   PRIVATE SECTION.
+    TYPES:
+      BEGIN OF ty_bo_properties,
+        const_interface            TYPE /bobf/obm_obj-const_interface,
+        object_model_cds_view_name TYPE c LENGTH 30,
+      END OF ty_bo_properties,
+
+      BEGIN OF ty_bo_node,
+        data_type                     TYPE /bobf/obm_node-data_type,
+        data_data_type                TYPE /bobf/obm_node-data_data_type,
+        data_table_type               TYPE /bobf/obm_node-data_table_type,
+        database_table                TYPE /bobf/obm_node-database_table,
+        auth_check_class              TYPE /bobf/obm_node-auth_check_class,
+        object_model_cds_view_name    TYPE c LENGTH 30,
+        object_mdl_active_persistence TYPE /bobf/obm_node-object_mdl_active_persistence,
+        draft_class                   TYPE /bobf/obm_node-draft_class,
+        draft_data_type               TYPE /bobf/obm_node-draft_data_type,
+        object_mdl_draft_persistence  TYPE /bobf/obm_node-object_mdl_draft_persistence,
+      END OF ty_bo_node.
+
     METHODS:
       find_bo_properties
         IMPORTING
@@ -79,32 +98,44 @@ CLASS zcl_dutils_oea_bobf_env_srv IMPLEMENTATION.
 
 
   METHOD find_bo_properties.
-    SELECT SINGLE const_interface,
-           object_model_cds_view_name
+    DATA bo_properties TYPE ty_bo_properties.
+
+    " 1) Select properties for NW >= 740
+    SELECT SINGLE const_interface
       FROM /bobf/obm_obj
       WHERE name = @bo_name
-      INTO @DATA(bo_properties).
+      INTO CORRESPONDING FIELDS OF @bo_properties.
 
-    IF sy-subrc = 0.
-      add_used_object(
-        EXPORTING used_obj_name = bo_properties-const_interface
-                  external_type = zif_dutils_c_tadir_type=>interface
-        CHANGING  used_objects  = used_objects ).
-      add_used_object(
-        EXPORTING used_obj_name = bo_properties-object_model_cds_view_name
-                  external_type = zif_dutils_c_tadir_type=>structured_object
-        CHANGING  used_objects  = used_objects ).
+    IF sy-subrc <> 0.
+      RETURN.
     ENDIF.
+
+    " 2) Try to select properties for NW > 740
+    DATA(select_list) = `object_model_cds_view_name`.
+    TRY.
+        SELECT SINGLE (select_list)
+          FROM /bobf/obm_obj
+          WHERE name = @bo_name
+          INTO CORRESPONDING FIELDS OF @bo_properties.
+      CATCH cx_sy_dynamic_osql_semantics ##NO_HANDLER.
+    ENDTRY.
+
+    _add_used_obj:
+      bo_properties-const_interface            zif_dutils_c_tadir_type=>interface,
+      bo_properties-object_model_cds_view_name zif_dutils_c_tadir_type=>structured_object.
   ENDMETHOD.
 
 
   METHOD find_nodes.
+    DATA: bo_nodes TYPE TABLE OF ty_bo_node.
+    FIELD-SYMBOLS: <node> TYPE zcl_dutils_oea_bobf_env_srv=>ty_bo_node.
+
+    " 1) Select properties for NW >= 740
     SELECT node~data_type,
            node~data_data_type,
            node~data_table_type,
            node~database_table,
            node~auth_check_class,
-           node~object_model_cds_view_name,
            node~object_mdl_active_persistence,
            node~draft_class,
            node~draft_data_type,
@@ -113,29 +144,42 @@ CLASS zcl_dutils_oea_bobf_env_srv IMPLEMENTATION.
         INNER JOIN /bobf/obm_node AS node
           ON bo~bo_key = node~bo_key
       WHERE bo~bo_name = @bo_name
-      INTO TABLE @DATA(bo_nodes).
+      INTO CORRESPONDING FIELDS OF TABLE @bo_nodes.
 
-    DEFINE _add_used_obj.
-      add_used_object(
-        EXPORTING used_obj_name = <node>-&1
-                  external_type = &2
-        CHANGING  used_objects  = used_objects ).
-    END-OF-DEFINITION.
+    IF sy-subrc <> 0.
+      RETURN.
+    ENDIF.
 
-    LOOP AT bo_nodes ASSIGNING FIELD-SYMBOL(<node>).
+    LOOP AT bo_nodes ASSIGNING <node>.
       _add_used_obj:
-        data_type                      zif_dutils_c_object_type=>structure,
-        data_data_type                 zif_dutils_c_object_type=>structure,
-        data_table_type                zif_dutils_c_tadir_type=>table_type,
-        database_table                 zif_dutils_c_tadir_type=>table,
-        auth_check_class               zif_dutils_c_tadir_type=>class,
-        object_model_cds_view_name     zif_dutils_c_tadir_type=>structured_object,
-        object_mdl_active_persistence  zif_dutils_c_tadir_type=>table,
-        draft_class                    zif_dutils_c_tadir_type=>class,
-        draft_data_type                zif_dutils_c_object_type=>structure,
-        object_mdl_draft_persistence   zif_dutils_c_tadir_type=>table.
+        <node>-data_type                      zif_dutils_c_object_type=>structure,
+        <node>-data_data_type                 zif_dutils_c_object_type=>structure,
+        <node>-data_table_type                zif_dutils_c_tadir_type=>table_type,
+        <node>-database_table                 zif_dutils_c_tadir_type=>table,
+        <node>-auth_check_class               zif_dutils_c_tadir_type=>class,
+        <node>-object_mdl_active_persistence  zif_dutils_c_tadir_type=>table,
+        <node>-draft_class                    zif_dutils_c_tadir_type=>class,
+        <node>-draft_data_type                zif_dutils_c_object_type=>structure,
+        <node>-object_mdl_draft_persistence   zif_dutils_c_tadir_type=>table.
     ENDLOOP.
 
+    " 2) Try to select properties for NW > 740
+    DATA(select_list) = `node~object_model_cds_view_name`.
+    TRY.
+        SELECT (select_list)
+          FROM /bobf/obm_bo AS bo
+            INNER JOIN /bobf/obm_node AS node
+              ON bo~bo_key = node~bo_key
+          WHERE bo~bo_name = @bo_name
+          INTO CORRESPONDING FIELDS OF TABLE @bo_nodes.
+      CATCH cx_sy_dynamic_osql_semantics ##NO_HANDLER.
+        RETURN.
+    ENDTRY.
+
+    LOOP AT bo_nodes ASSIGNING <node>.
+      _add_used_obj:
+        <node>-object_model_cds_view_name  zif_dutils_c_tadir_type=>structured_object.
+    ENDLOOP.
   ENDMETHOD.
 
 
@@ -146,22 +190,15 @@ CLASS zcl_dutils_oea_bobf_env_srv IMPLEMENTATION.
            export_param_tt
       FROM /bobf/act_list
       WHERE name = @bo_name
-        AND act_class IS NOT INITIAL
+        AND act_class <> ''
       INTO TABLE @DATA(bo_actions).
-
-    DEFINE _add_used_obj.
-      add_used_object(
-        EXPORTING used_obj_name = <action>-&1
-                  external_type = &2
-        CHANGING  used_objects  = used_objects ).
-    END-OF-DEFINITION.
 
     LOOP AT bo_actions ASSIGNING FIELD-SYMBOL(<action>).
       _add_used_obj:
-        act_class        zif_dutils_c_tadir_type=>class,
-        param_data_type  zif_dutils_c_object_type=>structure,
-        export_param_s   zif_dutils_c_object_type=>structure,
-        export_param_tt  zif_dutils_c_tadir_type=>table_type.
+        <action>-act_class        zif_dutils_c_tadir_type=>class,
+        <action>-param_data_type  zif_dutils_c_object_type=>structure,
+        <action>-export_param_s   zif_dutils_c_object_type=>structure,
+        <action>-export_param_tt  zif_dutils_c_tadir_type=>table_type.
     ENDLOOP.
 
   ENDMETHOD.
@@ -171,7 +208,7 @@ CLASS zcl_dutils_oea_bobf_env_srv IMPLEMENTATION.
     SELECT det_class
       FROM /bobf/det_list
       WHERE name = @bo_name
-        AND det_class IS NOT INITIAL
+        AND det_class <> ''
       INTO TABLE @DATA(bo_determinations).
 
     LOOP AT bo_determinations ASSIGNING FIELD-SYMBOL(<determination>).
@@ -187,7 +224,7 @@ CLASS zcl_dutils_oea_bobf_env_srv IMPLEMENTATION.
     SELECT val_class
       FROM /bobf/val_list
       WHERE name = @bo_name
-        AND val_class IS NOT INITIAL
+        AND val_class <> ''
       INTO TABLE @DATA(bo_validations).
 
     LOOP AT bo_validations ASSIGNING FIELD-SYMBOL(<validation>).

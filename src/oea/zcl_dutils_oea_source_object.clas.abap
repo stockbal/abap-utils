@@ -78,7 +78,7 @@ CLASS zcl_dutils_oea_source_object IMPLEMENTATION.
       object_type         = type
       object_sub_type     = sub_type
       parent_ref          = parent_ref
-      used_object_count   = lines( used_objects ) ) ).
+      used_object_count   = lines( used_objects_db ) ) ).
 
     data_access->insert_used_objects( used_objects_db ).
 
