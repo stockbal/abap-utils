@@ -30,10 +30,10 @@ CLASS zcl_dutils_oea_bobf_env_srv DEFINITION
         database_table                TYPE /bobf/obm_node-database_table,
         auth_check_class              TYPE /bobf/obm_node-auth_check_class,
         object_model_cds_view_name    TYPE c LENGTH 30,
-        object_mdl_active_persistence TYPE /bobf/obm_node-object_mdl_active_persistence,
-        draft_class                   TYPE /bobf/obm_node-draft_class,
-        draft_data_type               TYPE /bobf/obm_node-draft_data_type,
-        object_mdl_draft_persistence  TYPE /bobf/obm_node-object_mdl_draft_persistence,
+        object_mdl_active_persistence TYPE tabname,
+        draft_class                   TYPE classname,
+        draft_data_type               TYPE tabname,
+        object_mdl_draft_persistence  TYPE tabname,
       END OF ty_bo_node.
 
     METHODS:
@@ -165,11 +165,7 @@ CLASS zcl_dutils_oea_bobf_env_srv IMPLEMENTATION.
            node~data_data_type,
            node~data_table_type,
            node~database_table,
-           node~auth_check_class,
-           node~object_mdl_active_persistence,
-           node~draft_class,
-           node~draft_data_type,
-           node~object_mdl_draft_persistence
+           node~auth_check_class
       FROM /bobf/obm_bo AS bo
         INNER JOIN /bobf/obm_node AS node
           ON bo~bo_key = node~bo_key
@@ -194,7 +190,11 @@ CLASS zcl_dutils_oea_bobf_env_srv IMPLEMENTATION.
     ENDLOOP.
 
     " 2) Try to select properties for NW > 740
-    DATA(select_list) = `node~object_model_cds_view_name`.
+    DATA(select_list) = `node~object_model_cds_view_name, ` && |\r\n| &&
+                        `mode~object_mdl_active_persistence, ` && |\r\n| &&
+                        `mode~draft_class, ` && |\r\n| &&
+                        `mode~draft_data_type, ` && |\r\n| &&
+                        `mode~object_mdl_active_persistence`.
     TRY.
         SELECT (select_list)
           FROM /bobf/obm_bo AS bo
@@ -207,9 +207,12 @@ CLASS zcl_dutils_oea_bobf_env_srv IMPLEMENTATION.
     ENDTRY.
 
     LOOP AT bo_nodes ASSIGNING <node>.
-      APPEND VALUE #(
-        name          = <node>-object_model_cds_view_name
-        external_type = zif_dutils_c_tadir_type=>structured_object ) TO used_objects.
+      used_objects = VALUE #( BASE used_objects
+        ( name = <node>-object_model_cds_view_name     external_type = zif_dutils_c_tadir_type=>structured_object )
+        ( name = <node>-object_mdl_active_persistence  external_type = zif_dutils_c_tadir_type=>table )
+        ( name = <node>-draft_class                    external_type = zif_dutils_c_tadir_type=>class )
+        ( name = <node>-draft_data_type                external_type = zif_dutils_c_object_type=>structure )
+        ( name = <node>-object_mdl_draft_persistence   external_type = zif_dutils_c_tadir_type=>table ) ).
     ENDLOOP.
   ENDMETHOD.
 
