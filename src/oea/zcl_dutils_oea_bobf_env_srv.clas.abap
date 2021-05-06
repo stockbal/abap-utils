@@ -182,11 +182,7 @@ CLASS zcl_dutils_oea_bobf_env_srv IMPLEMENTATION.
         ( name = <node>-data_data_type                 external_type = zif_dutils_c_object_type=>structure )
         ( name = <node>-data_table_type                external_type = zif_dutils_c_tadir_type=>table_type )
         ( name = <node>-database_table                 external_type = zif_dutils_c_tadir_type=>table )
-        ( name = <node>-auth_check_class               external_type = zif_dutils_c_tadir_type=>class )
-        ( name = <node>-object_mdl_active_persistence  external_type = zif_dutils_c_tadir_type=>table )
-        ( name = <node>-draft_class                    external_type = zif_dutils_c_tadir_type=>class )
-        ( name = <node>-draft_data_type                external_type = zif_dutils_c_object_type=>structure )
-        ( name = <node>-object_mdl_draft_persistence   external_type = zif_dutils_c_tadir_type=>table ) ).
+        ( name = <node>-auth_check_class               external_type = zif_dutils_c_tadir_type=>class ) ).
     ENDLOOP.
 
     " 2) Try to select properties for NW > 740
