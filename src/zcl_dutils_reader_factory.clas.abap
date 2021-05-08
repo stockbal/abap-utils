@@ -6,14 +6,6 @@ CLASS zcl_dutils_reader_factory DEFINITION
 
   PUBLIC SECTION.
     CLASS-METHODS:
-      "! <p class="shorttext synchronized" lang="en">Creates instance of Repository Reader</p>
-      create_repo_reader
-        RETURNING
-          VALUE(result) TYPE REF TO zif_dutils_tadir_reader,
-      "! <p class="shorttext synchronized" lang="en">Retrieves instance to table reader</p>
-      get_table_reader
-        RETURNING
-          VALUE(result) TYPE REF TO zif_dutils_tabl_reader,
       "! <p class="shorttext synchronized" lang="en">Retrieves instance to package reader</p>
       get_package_reader
         RETURNING
@@ -21,13 +13,13 @@ CLASS zcl_dutils_reader_factory DEFINITION
   PROTECTED SECTION.
   PRIVATE SECTION.
     CLASS-DATA:
-      package_reader TYPE REF TO zif_dutils_devc_reader,
-      table_reader   TYPE REF TO zif_dutils_tabl_reader.
+      package_reader TYPE REF TO zif_dutils_devc_reader.
 ENDCLASS.
 
 
 
 CLASS zcl_dutils_reader_factory IMPLEMENTATION.
+
 
   METHOD get_package_reader.
     IF package_reader IS INITIAL.
@@ -37,16 +29,5 @@ CLASS zcl_dutils_reader_factory IMPLEMENTATION.
     result = package_reader.
   ENDMETHOD.
 
-  METHOD create_repo_reader.
-    result = NEW zcl_dutils_tadir_reader( ).
-  ENDMETHOD.
-
-  METHOD get_table_reader.
-    IF table_reader IS INITIAL.
-      table_reader = NEW zcl_dutils_tabl_reader( ).
-    ENDIF.
-
-    result = table_reader.
-  ENDMETHOD.
 
 ENDCLASS.
