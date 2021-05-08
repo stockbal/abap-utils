@@ -8,13 +8,6 @@ Utilities for ABAP Development
   Miscellaneous objects
 - **/src/ci**  
   Contains Classes/interfaces for Code Inspector Handling
-- **/src/oea (WIP)**  
-  Contains Classes/interfaces for Object Environment Analysis  
-  
-  Important Objects in package  
-  Object Name               | Purpose
-  --------------------------|------------------------------------
-  ZCL_DUTILS_OEA_ANALYZER   | Central class which handles object environment analysis. Can be created via ZCL_DUTILS_OEA_FACTORY=>CREATE_ANALYZER
 
 ## Installation
 
